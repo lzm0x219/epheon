@@ -14,8 +14,8 @@ export type Tolerance = {
  *
  * @param tolerance 要校验的误差容忍度。
  * @returns 校验通过时不返回值。
- * @throws TypeError 当 tolerance 中包含非有限数值时抛出。
- * @throws RangeError 当 tolerance 中包含负数时抛出。
+ * @throws PrimitiveError 当 tolerance 中包含非有限数值时抛出，错误码为 InvalidNumber。
+ * @throws PrimitiveError 当 tolerance 中包含负数时抛出，错误码为 InvalidTolerance。
  */
 export function assertValidTolerance(tolerance: Tolerance): void {
   assertFiniteNumber(tolerance.absolute, "tolerance.absolute");
@@ -46,8 +46,8 @@ export function assertValidTolerance(tolerance: Tolerance): void {
  * @param b 第二个有限数值。
  * @param tolerance 误差容忍度。
  * @returns 两个数在 tolerance 范围内近似相等时返回 true。
- * @throws TypeError 当 a、b 或 tolerance 中包含非有限数值时抛出。
- * @throws RangeError 当 tolerance 中包含负数时抛出。
+ * @throws PrimitiveError 当 a、b 或 tolerance 中包含非有限数值时抛出，错误码为 InvalidNumber。
+ * @throws PrimitiveError 当 tolerance 中包含负数时抛出，错误码为 InvalidTolerance。
  */
 export function almostEqual(a: number, b: number, tolerance: Tolerance): boolean {
   assertFiniteNumber(a, "a");

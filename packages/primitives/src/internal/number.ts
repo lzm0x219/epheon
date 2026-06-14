@@ -6,7 +6,7 @@ import { PrimitiveError } from "../errors";
  * @param value 要校验的数值。
  * @param name 错误消息中使用的参数名称。
  * @returns 校验通过时不返回值。
- * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+ * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
  */
 export function assertFiniteNumber(value: number, name: string): void {
   if (!Number.isFinite(value)) {
@@ -20,8 +20,8 @@ export function assertFiniteNumber(value: number, name: string): void {
  * @param value 要校验的数值。
  * @param name 错误消息中使用的参数名称。
  * @returns 校验通过时不返回值。
- * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
- * @throws RangeError 当 value 为 0 时抛出。
+ * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
+ * @throws PrimitiveError 当 value 为 0 时抛出，错误码为 DivisionByZero。
  */
 export function assertNonZeroFiniteNumber(value: number, name: string): void {
   assertFiniteNumber(value, name);
@@ -37,8 +37,8 @@ export function assertNonZeroFiniteNumber(value: number, name: string): void {
  * @param value 要归一化的有限数值。
  * @param period 正周期长度。
  * @returns 归一化后的数值。
- * @throws TypeError 当 value 或 period 为 NaN 或 Infinity 时抛出。
- * @throws RangeError 当 period 小于等于 0 时抛出。
+ * @throws PrimitiveError 当 value 或 period 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
+ * @throws PrimitiveError 当 period 小于等于 0 时抛出，错误码为 InvalidNumber。
  */
 export function normalizeModulo(value: number, period: number): number {
   assertFiniteNumber(value, "value");

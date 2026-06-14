@@ -26,7 +26,7 @@ export class Duration {
    *
    * @param value 秒数，必须是有限 number。
    * @returns 新的 Duration 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromSeconds(value: number): Duration {
     const result = Duration.parseSeconds(value);
@@ -58,7 +58,7 @@ export class Duration {
    *
    * @param value 毫秒数，必须是有限 number。
    * @returns 新的 Duration 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromMilliseconds(value: number): Duration {
     const result = Duration.parseMilliseconds(value);
@@ -90,7 +90,7 @@ export class Duration {
    *
    * @param value 日数，必须是有限 number。
    * @returns 新的 Duration 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromDays(value: number): Duration {
     const result = Duration.parseDays(value);
@@ -122,7 +122,7 @@ export class Duration {
    *
    * @param value 儒略年数，必须是有限 number。
    * @returns 新的 Duration 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromJulianYears(value: number): Duration {
     const result = Duration.parseJulianYears(value);
@@ -154,7 +154,7 @@ export class Duration {
    *
    * @param value 儒略世纪数，必须是有限 number。
    * @returns 新的 Duration 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromJulianCenturies(value: number): Duration {
     const result = Duration.parseJulianCenturies(value);
@@ -251,7 +251,7 @@ export class Duration {
    *
    * @param factor 缩放因子，必须是有限 number。
    * @returns 缩放后的新 Duration 值对象。
-   * @throws TypeError 当 factor 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 factor 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   multiply(factor: number): Duration {
     assertFiniteNumber(factor, "factor");
@@ -263,8 +263,8 @@ export class Duration {
    *
    * @param divisor 除数，必须是有限且非零的 number。
    * @returns 相除后的新 Duration 值对象。
-   * @throws TypeError 当 divisor 为 NaN 或 Infinity 时抛出。
-   * @throws RangeError 当 divisor 为 0 时抛出。
+   * @throws PrimitiveError 当 divisor 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
+   * @throws PrimitiveError 当 divisor 为 0 时抛出，错误码为 DivisionByZero。
    */
   divide(divisor: number): Duration {
     assertNonZeroFiniteNumber(divisor, "divisor");
@@ -305,8 +305,8 @@ export class Duration {
    * @param other 要比较的另一个时长。
    * @param tolerance 以秒为单位的误差容忍度。
    * @returns 两个时长在 tolerance 范围内近似相等时返回 true。
-   * @throws TypeError 当 tolerance 中包含非有限数值时抛出。
-   * @throws RangeError 当 tolerance 中包含负数时抛出。
+   * @throws PrimitiveError 当 tolerance 中包含非有限数值时抛出，错误码为 InvalidNumber。
+   * @throws PrimitiveError 当 tolerance 中包含负数时抛出，错误码为 InvalidTolerance。
    */
   almostEquals(other: Duration, tolerance: Tolerance): boolean {
     return almostEqual(this.#seconds, other.#seconds, tolerance);

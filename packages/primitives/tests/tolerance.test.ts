@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { almostEqual } from "../src";
+import { almostEqual, PrimitiveError } from "../src";
 
 describe("almostEqual", () => {
   it("uses absolute and relative tolerance", () => {
@@ -9,7 +9,7 @@ describe("almostEqual", () => {
   });
 
   it("rejects invalid tolerance", () => {
-    expect(() => almostEqual(1, 1, { absolute: -1 })).toThrow(RangeError);
-    expect(() => almostEqual(1, 1, { absolute: Number.NaN })).toThrow(TypeError);
+    expect(() => almostEqual(1, 1, { absolute: -1 })).toThrow(PrimitiveError);
+    expect(() => almostEqual(1, 1, { absolute: Number.NaN })).toThrow(PrimitiveError);
   });
 });

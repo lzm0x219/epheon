@@ -177,11 +177,11 @@ class PrimitiveError extends Error {
 
 `fromXxx()` 构造方法抛出 `PrimitiveError`，`parseXxx()` 将其放入 `Result` 的 `Err` 分支。
 
-| 错误码             | 触发场景                                         |
-| ------------------ | ------------------------------------------------ |
-| `InvalidNumber`    | 传入 NaN、+Infinity、-Infinity                   |
-| `DivisionByZero`   | `divide(0)`                                      |
-| `InvalidTolerance` | tolerance.absolute 或 .relative 为负数或非有限值 |
+| 错误码             | 触发场景                               |
+| ------------------ | -------------------------------------- |
+| `InvalidNumber`    | 传入 NaN、+Infinity、-Infinity         |
+| `DivisionByZero`   | `divide(0)`                            |
+| `InvalidTolerance` | tolerance.absolute 或 .relative 为负数 |
 
 ## 许可
 

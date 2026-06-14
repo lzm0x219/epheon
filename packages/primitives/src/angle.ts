@@ -26,7 +26,7 @@ export class Angle {
    *
    * @param value 弧度值，必须是有限 number。
    * @returns 新的 Angle 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromRadians(value: number): Angle {
     const result = Angle.parseRadians(value);
@@ -58,7 +58,7 @@ export class Angle {
    *
    * @param value 角度值，必须是有限 number。
    * @returns 新的 Angle 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromDegrees(value: number): Angle {
     const result = Angle.parseDegrees(value);
@@ -90,7 +90,7 @@ export class Angle {
    *
    * @param value 整圈数，必须是有限 number。
    * @returns 新的 Angle 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromTurns(value: number): Angle {
     const result = Angle.parseTurns(value);
@@ -122,7 +122,7 @@ export class Angle {
    *
    * @param value 角分值，必须是有限 number。
    * @returns 新的 Angle 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromArcminutes(value: number): Angle {
     const result = Angle.parseArcminutes(value);
@@ -154,7 +154,7 @@ export class Angle {
    *
    * @param value 角秒值，必须是有限 number。
    * @returns 新的 Angle 值对象。
-   * @throws TypeError 当 value 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 value 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   static fromArcseconds(value: number): Angle {
     const result = Angle.parseArcseconds(value);
@@ -288,7 +288,7 @@ export class Angle {
    *
    * @param factor 缩放因子，必须是有限 number。
    * @returns 缩放后的新 Angle 值对象。
-   * @throws TypeError 当 factor 为 NaN 或 Infinity 时抛出。
+   * @throws PrimitiveError 当 factor 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
    */
   multiply(factor: number): Angle {
     assertFiniteNumber(factor, "factor");
@@ -300,8 +300,8 @@ export class Angle {
    *
    * @param divisor 除数，必须是有限且非零的 number。
    * @returns 相除后的新 Angle 值对象。
-   * @throws TypeError 当 divisor 为 NaN 或 Infinity 时抛出。
-   * @throws RangeError 当 divisor 为 0 时抛出。
+   * @throws PrimitiveError 当 divisor 为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
+   * @throws PrimitiveError 当 divisor 为 0 时抛出，错误码为 DivisionByZero。
    */
   divide(divisor: number): Angle {
     assertNonZeroFiniteNumber(divisor, "divisor");
@@ -342,8 +342,8 @@ export class Angle {
    * @param other 要比较的另一个角度。
    * @param tolerance 以弧度为单位的误差容忍度。
    * @returns 两个角度在 tolerance 范围内近似相等时返回 true。
-   * @throws TypeError 当 tolerance 中包含非有限数值时抛出。
-   * @throws RangeError 当 tolerance 中包含负数时抛出。
+   * @throws PrimitiveError 当 tolerance 中包含非有限数值时抛出，错误码为 InvalidNumber。
+   * @throws PrimitiveError 当 tolerance 中包含负数时抛出，错误码为 InvalidTolerance。
    */
   almostEquals(other: Angle, tolerance: Tolerance): boolean {
     return almostEqual(this.#radians, other.#radians, tolerance);
