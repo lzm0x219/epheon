@@ -450,6 +450,14 @@ src/
 tests/*.test.ts
 ```
 
+角度、时长等稳定换算样例统一放入：
+
+```txt
+standards/primitives/
+```
+
+测试优先读取这些 fixture，避免同一类标准数值在多个测试文件里重复硬编码。
+
 ---
 
 ## 十四、与 temporal 的关系

@@ -196,16 +196,24 @@ noUncheckedIndexedAccess: true
 类型声明：必须生成 .d.ts
 ```
 
-每个 package 应声明明确的 `exports`：
+每个 package 的开发期 `exports` 应遵循 tsdown `devExports` 行为，指向源码入口：
 
 ```json
 {
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.js"
-    }
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs"
+      },
+      "./package.json": "./package.json"
+    },
+    "access": "public"
   }
 }
 ```
@@ -213,6 +221,8 @@ noUncheckedIndexedAccess: true
 当前 package 骨架的构建配置输出 ESM 与 CJS。
 
 源码仍以 TypeScript 与 ESM 语义为准，CJS 只作为发布产物兼容层。
+
+发布态 `publishConfig.exports` 不手写自定义类型条件，保持 tsdown `devExports` 的生成形态：开发期源码入口与发布期 `dist/` 运行时入口分离。package 入口质量检查由 Moon build 中的 tsdown/publint 流程承担，不额外提供根级 `publint` script。
 
 如果后续发现双格式输出增加维护成本，可以通过独立 RFC 收缩为 ESM-only。
 
@@ -225,7 +235,7 @@ noUncheckedIndexedAccess: true
 当前状态：
 
 ```txt
-pnpm catalog 已声明 tsdown 0.21.7。
+pnpm catalog 已声明 tsdown 0.22.2。
 根 package.json 尚未把 tsdown 加入 devDependencies。
 根 package.json 已提供 build 脚本。
 packages/primitives 与 packages/temporal 已声明 tsdown devDependency。
@@ -243,30 +253,21 @@ packages/primitives 与 packages/temporal 已包含 tsdown.config.ts。
 适合 monorepo package 输出
 ```
 
-每个核心包应提供：
+子包不声明 `scripts` 字段。构建任务由 Moonrepo 的 `moon.yml` 接管，测试、类型检查、lint 和格式化统一通过仓库根目录脚本聚合执行。
 
-```txt
-build
-dev
-typecheck
-test
-```
-
-根目录脚本负责聚合执行。
-
-第一阶段实现开始后，根脚本应更新为：
+根脚本当前约定为：
 
 ```json
 {
   "scripts": {
-    "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "build": "pnpm moon run :build",
+    "typecheck": "tsgo --noEmit",
+    "test": "vitest"
   }
 }
 ```
 
-当前根 `test` 脚本已运行 Vitest。
+当前根 `test` 脚本已通过 Vitest workspace projects 运行所有包测试。
 
 ---
 
@@ -322,6 +323,14 @@ expectAlmostEqual(actual, expected, tolerance)
 ```
 
 不要在天文计算中使用隐含的精度判断。
+
+共享标准样例统一放在：
+
+```txt
+standards/
+```
+
+包级单元测试可以读取 `standards/` 下对应领域的 JSON fixture。角度、时长、Julian Day、TT/JDE、UT1 offset 和 Delta-T 等稳定样例不应散落硬编码在多个测试文件中；只有非常局部的边界输入才允许直接写在测试用例里。
 
 ---
 
@@ -456,7 +465,7 @@ vitest
 @moonrepo/cli: 2.3.3
 @vitest/coverage-v8: 4.1.8
 @types/node: 25.5.2
-@typescript/native-preview: 7.0.0-dev.20260611.2
+@typescript/native-preview: 7.0.0-dev.20260614.1
 @changesets/cli: 3.0.0-next.5
 @changesets/types: 6.1.0
 vite: 8.0.16
@@ -465,7 +474,7 @@ lefthook: 2.1.9
 oxfmt: 0.54.0
 oxlint: 1.69.0
 oxlint-tsgolint: 0.23.0
-tsdown: 0.21.7
+tsdown: 0.22.2
 typescript: 6.0.3
 publint: 0.3.21
 ```
@@ -539,8 +548,9 @@ license
 type
 exports
 files
-scripts
 ```
+
+子包不需要 `scripts` 字段；构建入口在 `moon.yml` 中声明，测试入口使用根 `pnpm test`。
 
 ---
 
@@ -560,8 +570,8 @@ pnpm build
 ```txt
 尚未添加 CI 配置。
 .github/ 目录当前只有 renovate.json。
-根 package.json 尚未提供 build/typecheck/lint/format 脚本。
-根 package.json 的 test 仍是占位失败命令。
+根 package.json 已提供 build/typecheck/test/lint/format/format:check 脚本。
+CI workflow 暂缓创建。
 ```
 
 后续再增加：
@@ -584,6 +594,15 @@ standards/
 ```
 
 或独立 dataset package。
+
+当前已经存在：
+
+```txt
+standards/primitives/
+standards/temporal/
+```
+
+其中 `standards/temporal/` 当前包含 Julian Day 与时间尺度转换 fixture。这些 fixture 是测试与未来 conformance 的共同输入，不属于核心包运行时代码。
 
 ---
 

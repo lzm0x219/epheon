@@ -175,15 +175,16 @@ UTC 与 TAI 的转换依赖闰秒数据。
 `@epheon/temporal` 不应内置完整闰秒表，而应通过 provider 注入：
 
 ```ts
-interface LeapSecondProvider {
-  taiMinusUtc(instant: UtcInstantLike): number;
-}
+type LeapSecondProvider = (input: UtcDateTime) => number;
 ```
+
+`UtcDateTime` 是公开值对象，用来表达带显式 UTC offset 的输入边界。provider
+不得依赖 `src/internal/` 中的解析字段或算法辅助类型。
 
 第一阶段可以提供一个固定 provider 用于测试：
 
 ```ts
-const fixedLeapSeconds = LeapSecondProvider.fixed(37);
+const provider = fixedLeapSeconds(37);
 ```
 
 真实闰秒数据应进入未来的：
@@ -237,9 +238,7 @@ Delta-T = TT - UT1
 应定义 provider：
 
 ```ts
-interface DeltaTProvider {
-  deltaT(instant: Instant): Duration;
-}
+type DeltaTProvider = (instant: Instant) => Duration;
 ```
 
 Provider 可以来自：
@@ -252,7 +251,9 @@ Provider 可以来自：
 用户自定义模型
 ```
 
-第一阶段只需要接口、固定 provider、简单测试样例。
+第一阶段提供函数型 provider、固定 provider、`InstantOptions.deltaT` 注入点和
+`Instant.toUT1()`。未注入 Delta-T provider 时调用 `toUT1()` 必须抛出
+`TemporalError`，错误码为 `MissingDeltaTProvider`。
 
 ---
 
@@ -265,6 +266,7 @@ UTC -> TAI
 TAI -> TT
 UTC -> TT
 TT -> JDE
+TT -> UT1
 UTC -> JD
 ```
 
@@ -272,7 +274,6 @@ UTC -> JD
 
 ```txt
 TDB
-完整 UT1 反算
 高精度地球自转参数
 时区数据库
 历史历法改革前后的区域民用日期
@@ -332,6 +333,14 @@ MILLISECOND_TOLERANCE
 
 不要在测试中直接散落魔法数字。
 
+Julian Day、TT/JDE、UT1 offset 与 Delta-T 的稳定样例应放入：
+
+```txt
+standards/temporal/
+```
+
+包级测试优先读取这些 fixture，再针对局部错误边界补少量内联用例。
+
 ---
 
 ## 十三、错误模型
@@ -341,16 +350,20 @@ MILLISECOND_TOLERANCE
 建议错误类型：
 
 ```txt
-InvalidDateTimeString
-MissingUtcOffset
-UnsupportedTimeScale
-MissingLeapSecondProvider
-MissingDeltaTProvider
-OutOfRangeDate
 InvalidJulianDay
+InvalidTimeScaleInput
+InvalidUTCDateTime
+MissingDeltaTProvider
 ```
 
-错误模型的具体承载方式由 `0004-primitives-api.md` 中的 `Result` 或异常策略统一决定。
+第一阶段公共错误统一收敛为 `TemporalError`。`fromXxx` 便捷 API 抛出
+`TemporalError`，`parseXxx` API 返回 `Result<..., TemporalError>`。
+内部解析器、Gregorian 校验和数值校验不向公共 API 泄漏 `TypeError` 或
+`RangeError`。
+
+Provider 属于外部注入边界。闰秒或 Delta-T provider 抛错、返回 `NaN`、
+`Infinity` 或其他非法时间尺度输入时，公共 API 必须收敛为 `TemporalError`，
+错误码为 `InvalidTimeScaleInput`。
 
 ---
 
@@ -365,21 +378,31 @@ export class Instant {
   toJulianDay(): JulianDay;
   toJulianEphemerisDay(): JulianEphemerisDay;
   toTT(): TimePoint;
+  toUT1(): TimePoint;
+  toUTCDateTime(): UtcDateTime;
+  toUTCFields(): UtcDateTimeFields;
+}
+
+export class UtcDateTime {
+  static fromFields(fields: UtcDateTimeFields): UtcDateTime;
+  toFields(): UtcDateTimeFields;
 }
 
 export class JulianDay {
   static fromNumber(value: number): JulianDay;
+  static parseNumber(value: number): Result<JulianDay, TemporalError>;
   toNumber(): number;
 }
 
 export class JulianEphemerisDay {
   static fromNumber(value: number): JulianEphemerisDay;
+  static parseNumber(value: number): Result<JulianEphemerisDay, TemporalError>;
   toNumber(): number;
 }
 
 export type DeltaTProvider = (instant: Instant) => Duration;
 
-export type LeapSecondProvider = (input: UtcInstantLike) => number;
+export type LeapSecondProvider = (input: UtcDateTime) => number;
 ```
 
 这是设计草案，不是最终实现签名。
@@ -390,6 +413,8 @@ export type LeapSecondProvider = (input: UtcInstantLike) => number;
 Instant
 JulianDay
 JulianEphemerisDay
+UtcDateTime
+UtcDateTimeFields
 TemporalError
 Provider 类型与固定 provider helper
 ```
@@ -403,6 +428,10 @@ Gregorian -> JD 辅助函数
 时间常量
 内部数值校验
 ```
+
+`src/internal/` 不定义可被公共 API 直接复用的字段模型。若 provider、`Instant`
+输出或外部调用方需要持有 UTC 边界数据，必须使用公开的 `UtcDateTime` 或
+`UtcDateTimeFields`。
 
 Provider 第一阶段优先使用函数类型。若后续需要暴露数据来源、覆盖时间范围、精度说明或版本信息，可以升级为轻量接口：
 

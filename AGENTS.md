@@ -21,7 +21,7 @@ Epheon 目前处于工程骨架阶段。现有文档位于 `docs/rfcs/`，文件
 在仓库根目录使用 `pnpm`。当前 `package.json` 已接入 `build`、`typecheck`、`test`、`lint`、`format` 与 `format:check` 脚本。
 
 - `pnpm install --frozen-lockfile`：按 lockfile 安装依赖。
-- `pnpm exec vitest run`：使用当前 Vitest 配置运行测试。
+- `pnpm test`：使用根 Vitest 配置聚合运行所有包测试。
 - `pnpm exec oxlint`：使用 Oxlint 检查代码。
 - `pnpm exec oxfmt --check .`：使用 Oxfmt 检查格式。
 - `pnpm exec lefthook run pre-commit`：手动运行 pre-commit 检查。
@@ -41,7 +41,7 @@ Epheon 目前处于工程骨架阶段。现有文档位于 `docs/rfcs/`，文件
 
 每个包的 `src/index.ts` 是公共 API 边界。默认只导出稳定领域对象、provider 类型和明确承诺的 helper。解析器、Gregorian 辅助计算、常量、数值校验等实现细节放入 `src/internal/`，不得从主入口导出，也不得被其他 package 跨包引用。
 
-包构建使用 `tsdown.config.ts`，入口约定为 `src/index.ts`，当前配置输出 ESM 与 CJS，并生成类型声明。package 的开发期 `exports` 指向源码，发布期 `publishConfig.exports` 指向 `dist/`。
+包构建使用 `tsdown.config.ts`，入口约定为 `src/index.ts`，当前配置输出 ESM 与 CJS，并生成类型声明。package 的开发期 `exports` 指向源码，发布期 `publishConfig.exports` 遵循 tsdown `devExports` 生成行为，只映射 import/require 运行时入口到 `dist/`，不得手写成另一套自定义发布出口。package 入口质量检查由 Moon build 中的 tsdown/publint 流程承担。
 
 代码检查与格式化使用 Oxlint 和 Oxfmt，不使用 ESLint/Prettier。Oxfmt 会排序 `package.json` 和 import，默认 `tabWidth` 为 2、`printWidth` 为 100。EditorConfig 要求 2 空格、LF、UTF-8、去除行尾空白并保留文件末尾换行。Markdown 保持简洁，并沿用 RFC 命名模式：`0003-topic-name.md`。
 
@@ -49,7 +49,7 @@ Lefthook 当前 pre-commit hook 并行执行三个 job：`lint` 对已暂存的 
 
 ## 测试指南
 
-包测试使用 Vitest 4，根配置启用 `projects: ["packages/*"]` 和 V8 coverage provider。数值测试必须显式声明误差容忍度，例如 `expectAlmostEqual(actual, expected, tolerance)`。优先覆盖边界输入、非法输入、已知 Julian Day 样例、时间尺度转换与 provider 替换行为。
+包测试使用 Vitest 4，根配置启用 `projects: ["packages/*"]` 和 V8 coverage provider。测试统一通过仓库根目录的 `pnpm test` 聚合运行，子包不声明独立 `test` script。数值测试必须显式声明误差容忍度，例如 `expectAlmostEqual(actual, expected, tolerance)`。优先覆盖边界输入、非法输入、已知 Julian Day 样例、时间尺度转换与 provider 替换行为。
 
 单元测试统一放入包级 `tests/` 目录，不和 `src/` 源码混放。测试默认从包入口 `../src` 导入，以验证公共 API；只有针对内部算法的窄测试才允许显式导入 `src/internal/*`。共享 fixture 放入 `standards/`，不要把大型数据集嵌入核心包。
 

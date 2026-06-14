@@ -557,12 +557,16 @@ JS Date 只能出现在适配层：
 ### 示例 API
 
 ```ts
-const instant = Instant.fromUTC("2026-02-04T08:00:00+08:00");
+const instant = Instant.fromUTC("2026-02-04T08:00:00+08:00", {
+  leapSeconds: leapSecondProvider,
+  deltaT: deltaTProvider
+});
 
 instant.toJulianDay();
 instant.toTT();
-instant.toUTC();
-instant.deltaT();
+instant.toUT1();
+instant.toUTCDateTime();
+instant.toUTCFields();
 ```
 
 ### 关键概念

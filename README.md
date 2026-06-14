@@ -154,7 +154,7 @@ Changesets
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm exec vitest run
+pnpm test
 pnpm exec oxlint
 pnpm exec oxfmt --check .
 pnpm exec lefthook run pre-commit
@@ -162,7 +162,7 @@ pnpm exec moon run :build
 pnpm exec changeset
 ```
 
-在 `packages/*/src/index.ts` 和包级测试补齐之前，部分命令可能会失败。
+当前根命令已可用于验证第一阶段包的构建、测试、类型检查、lint 与格式化状态。
 
 ## 设计原则
 
