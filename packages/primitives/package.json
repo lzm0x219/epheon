@@ -1,6 +1,7 @@
 {
   "name": "@epheon/primitives",
   "version": "0.1.0",
+  "description": "Foundational immutable values and numeric helpers for Epheon.",
   "homepage": "https://github.com/lzm0x219/epheon/tree/main/packages/primitives#readme",
   "bugs": {
     "url": "https://github.com/lzm0x219/epheon/issues"
@@ -40,8 +41,7 @@
   "devDependencies": {
     "@typescript/native-preview": "catalog:",
     "tsdown": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=24.16.0"

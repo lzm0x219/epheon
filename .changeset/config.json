@@ -4,7 +4,7 @@
   "access": "public",
   "ignore": [],
   "fixed": [],
-  "linked": ["@epheon/*"],
+  "linked": [["@epheon/primitives", "@epheon/temporal"]],
   "format": "auto",
   "updateInternalDependencies": "patch",
   "commit": false,

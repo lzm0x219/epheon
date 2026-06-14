@@ -2,7 +2,7 @@
   "name": "epheon",
   "private": true,
   "scripts": {
-    "build": "pnpm moon run build",
+    "build": "pnpm moon run :build",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint",
