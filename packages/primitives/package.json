@@ -37,11 +37,6 @@
     },
     "access": "public"
   },
-  "scripts": {
-    "build": "tsdown",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
-  },
   "devDependencies": {
     "@typescript/native-preview": "catalog:",
     "tsdown": "catalog:",

@@ -2,12 +2,13 @@
   "name": "epheon",
   "private": true,
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm moon run build",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint",
-    "test": "vitest run",
-    "typecheck": "pnpm -r typecheck"
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsgo --noEmit"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

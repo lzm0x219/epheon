@@ -2,7 +2,7 @@ pre-commit:
   parallel: true
   jobs:
     - name: lint
-      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
+      glob: "*.{js,ts,cjs,mjs,jsx,tsx}"
       run: pnpm exec oxlint {staged_files}
       stage_fixed: true
 
@@ -12,5 +12,6 @@ pre-commit:
       stage_fixed: true
 
     - name: type check
+      glob: "*.{js,ts,cjs,mjs,jsx,tsx}"
       run: pnpm exec oxlint --type-aware {staged_files}
       stage_fixed: true
