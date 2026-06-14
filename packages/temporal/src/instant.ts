@@ -1,20 +1,23 @@
 import { Duration, err, ok, type Result } from "@epheon/primitives";
-import type { UtcDateTimeFields } from "./internal/utc-fields";
-import type { LeapSecondProvider } from "./providers";
+import type { DeltaTProvider, LeapSecondProvider } from "./providers";
 import { TemporalError, toTemporalError } from "./errors";
 import { MINUTES_PER_DAY, SECONDS_PER_DAY, TT_MINUS_TAI_SECONDS } from "./internal/constants";
 import { gregorianToJulianDay } from "./internal/gregorian";
+import { assertFiniteNumber } from "./internal/number";
 import { parseUTCDateTime } from "./internal/utc-parser";
 import { JulianDay, JulianEphemerisDay } from "./julian-day";
+import { UtcDateTime, type UtcDateTimeFields } from "./utc-date-time";
 
 export type InstantOptions = {
   /** UTC 到 TAI 转换所需的闰秒 provider；未提供时第一阶段按 0 处理。 */
   readonly leapSeconds?: LeapSecondProvider;
+  /** TT 到 UT1 转换所需的 Delta-T provider；只在请求 UT1 表达时使用。 */
+  readonly deltaT?: DeltaTProvider;
 };
 
 /** 某个时间点在指定时间尺度下的表达。 */
 export type TimePoint = {
-  readonly scale: "TT";
+  readonly scale: "TT" | "UT1";
   /** 该时间尺度相对 UTC 的偏移量。 */
   readonly offsetFromUtc: Duration;
 };
@@ -27,13 +30,20 @@ export type TimePoint = {
  */
 export class Instant {
   readonly #utcJulianDay: JulianDay;
-  readonly #utcFields: UtcDateTimeFields;
+  readonly #utcDateTime: UtcDateTime;
   readonly #leapSeconds: number;
+  readonly #deltaT: DeltaTProvider | undefined;
 
-  private constructor(utcJulianDay: JulianDay, utcFields: UtcDateTimeFields, leapSeconds: number) {
+  private constructor(
+    utcJulianDay: JulianDay,
+    utcDateTime: UtcDateTime,
+    leapSeconds: number,
+    deltaT: DeltaTProvider | undefined
+  ) {
     this.#utcJulianDay = utcJulianDay;
-    this.#utcFields = utcFields;
+    this.#utcDateTime = utcDateTime;
     this.#leapSeconds = leapSeconds;
+    this.#deltaT = deltaT;
   }
 
   /**
@@ -63,27 +73,29 @@ export class Instant {
    */
   static parseUTC(input: string, options: InstantOptions = {}): Result<Instant, TemporalError> {
     try {
-      return ok(Instant.fromUTCFields(parseUTCDateTime(input), options));
+      return ok(Instant.fromUTCDateTime(parseUTCDateTime(input), options));
     } catch (error) {
       return err(toTemporalError(error, "InvalidUTCDateTime"));
     }
   }
 
   /**
-   * 从已校验的 UTC 字段构造 Instant，避免 public API 绕过解析边界。
+   * 从已校验的 UTC 输入边界值对象构造 Instant。
    *
-   * @param utcFields 已通过 Gregorian 与 offset 校验的 UTC 字段。
+   * @param utcDateTime 已通过 Gregorian 与 offset 校验的 UTC 输入边界值对象。
    * @param options provider 注入选项。
    * @returns 新的 Instant 值对象。
+   * @throws TemporalError 当 provider 抛错或返回非法时间尺度数值时抛出。
    */
-  private static fromUTCFields(utcFields: UtcDateTimeFields, options: InstantOptions): Instant {
+  private static fromUTCDateTime(utcDateTime: UtcDateTime, options: InstantOptions): Instant {
+    const utcFields = utcDateTime.toFields();
     const localJulianDay = gregorianToJulianDay(utcFields);
     const utcJulianDay = JulianDay.fromNumber(
       localJulianDay - utcFields.offsetMinutes / MINUTES_PER_DAY
     );
-    const leapSeconds = options.leapSeconds?.(utcFields) ?? 0;
+    const leapSeconds = readLeapSeconds(utcDateTime, options);
 
-    return new Instant(utcJulianDay, utcFields, leapSeconds);
+    return new Instant(utcJulianDay, utcDateTime, leapSeconds, options.deltaT);
   }
 
   /**
@@ -121,11 +133,67 @@ export class Instant {
   }
 
   /**
+   * 返回当前 Instant 在 UT1 时间尺度下相对 UTC 的偏移表达。
+   *
+   * Delta-T 定义为 TT - UT1，因此 UT1-UTC 等于 TT-UTC 减去 Delta-T。
+   *
+   * @returns scale 为 UT1、offsetFromUtc 为 UT1-UTC 的 TimePoint。
+   * @throws TemporalError 当构造 Instant 时未注入 deltaT provider，或 provider 计算失败时抛出。
+   */
+  toUT1(): TimePoint {
+    if (this.#deltaT === undefined) {
+      throw new TemporalError(
+        "MissingDeltaTProvider",
+        "deltaT provider is required to compute UT1."
+      );
+    }
+
+    try {
+      return {
+        scale: "UT1",
+        offsetFromUtc: this.toTT().offsetFromUtc.subtract(this.#deltaT(this))
+      };
+    } catch (error) {
+      throw toTemporalError(error, "InvalidTimeScaleInput");
+    }
+  }
+
+  /**
+   * 返回解析后的 UTC 输入边界值对象。
+   *
+   * @returns 当前 Instant 对应的 UtcDateTime 值对象。
+   */
+  toUTCDateTime(): UtcDateTime {
+    return this.#utcDateTime;
+  }
+
+  /**
    * 返回解析后的 UTC 字段副本，避免调用方修改内部状态。
    *
    * @returns UTC 日期时间字段副本。
    */
   toUTCFields(): UtcDateTimeFields {
-    return { ...this.#utcFields };
+    return this.#utcDateTime.toFields();
+  }
+}
+
+/**
+ * 读取并校验 leap second provider 的返回值。
+ *
+ * provider 是外部注入边界，返回 NaN/Infinity 或抛出异常时必须收敛成
+ * temporal 包自己的结构化错误，避免泄漏下游实现细节。
+ *
+ * @param utcDateTime provider 接收的 UTC 输入边界值对象。
+ * @param options Instant 构造选项。
+ * @returns 有限的 TAI - UTC 秒数。
+ * @throws TemporalError 当 provider 抛错或返回非有限数时抛出。
+ */
+function readLeapSeconds(utcDateTime: UtcDateTime, options: InstantOptions): number {
+  try {
+    const leapSeconds = options.leapSeconds?.(utcDateTime) ?? 0;
+    assertFiniteNumber(leapSeconds, "leapSeconds", "InvalidTimeScaleInput");
+    return leapSeconds;
+  } catch (error) {
+    throw toTemporalError(error, "InvalidTimeScaleInput");
   }
 }

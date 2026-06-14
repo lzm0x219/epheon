@@ -1,4 +1,5 @@
-import type { UtcDateTimeFields } from "./utc-fields";
+import type { UtcDateTimeFields } from "../utc-date-time";
+import { TemporalError } from "../errors";
 import { SECONDS_PER_DAY } from "./constants";
 
 /**
@@ -37,31 +38,31 @@ export function daysInGregorianMonth(year: number, month: number): number {
  *
  * @param fields 解析得到的 UTC 日期时间字段。
  * @returns 校验通过时不返回值。
- * @throws RangeError 当月份、日期、时分秒超出 Gregorian 合法范围时抛出。
+ * @throws TemporalError 当月份、日期、时分秒超出 Gregorian 合法范围时抛出。
  */
 export function assertGregorianDateTime(fields: UtcDateTimeFields): void {
   if (fields.month < 1 || fields.month > 12) {
-    throw new RangeError("month is out of range.");
+    throw new TemporalError("InvalidUTCDateTime", "month is out of range.");
   }
 
   if (fields.day < 1 || fields.day > 31) {
-    throw new RangeError("day is out of range.");
+    throw new TemporalError("InvalidUTCDateTime", "day is out of range.");
   }
 
   if (fields.day > daysInGregorianMonth(fields.year, fields.month)) {
-    throw new RangeError("day is out of range for month.");
+    throw new TemporalError("InvalidUTCDateTime", "day is out of range for month.");
   }
 
-  if (fields.hour > 23) {
-    throw new RangeError("hour is out of range.");
+  if (fields.hour < 0 || fields.hour > 23) {
+    throw new TemporalError("InvalidUTCDateTime", "hour is out of range.");
   }
 
-  if (fields.minute > 59) {
-    throw new RangeError("minute is out of range.");
+  if (fields.minute < 0 || fields.minute > 59) {
+    throw new TemporalError("InvalidUTCDateTime", "minute is out of range.");
   }
 
   if (fields.second < 0 || fields.second >= 61) {
-    throw new RangeError("second is out of range.");
+    throw new TemporalError("InvalidUTCDateTime", "second is out of range.");
   }
 }
 

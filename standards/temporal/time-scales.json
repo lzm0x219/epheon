@@ -1,0 +1,31 @@
+{
+  "timeScaleConversions": [
+    {
+      "input": "2000-01-01T12:00:00Z",
+      "julianDay": 2451545,
+      "taiMinusUtcSeconds": 32,
+      "deltaTSeconds": 64,
+      "ttMinusUtcSeconds": 64.184,
+      "ut1MinusUtcSeconds": 0.184,
+      "julianEphemerisDay": 2451545.0007428704
+    },
+    {
+      "input": "2000-01-01T20:00:00+08:00",
+      "julianDay": 2451545,
+      "taiMinusUtcSeconds": 32,
+      "deltaTSeconds": 64,
+      "ttMinusUtcSeconds": 64.184,
+      "ut1MinusUtcSeconds": 0.184,
+      "julianEphemerisDay": 2451545.0007428704
+    },
+    {
+      "input": "1999-01-01T00:00:00Z",
+      "julianDay": 2451179.5,
+      "taiMinusUtcSeconds": 32,
+      "deltaTSeconds": 63.83,
+      "ttMinusUtcSeconds": 64.184,
+      "ut1MinusUtcSeconds": 0.354,
+      "julianEphemerisDay": 2451179.5007428704
+    }
+  ]
+}

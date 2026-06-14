@@ -1,17 +1,14 @@
 import type { Duration } from "@epheon/primitives";
 import type { Instant } from "./instant";
-import type { UtcDateTimeFields } from "./internal/utc-fields";
-
-/** UTC 输入字段的 provider 视图，后续可替换为更稳定的公共输入类型。 */
-export type UtcInstantLike = UtcDateTimeFields;
+import type { UtcDateTime } from "./utc-date-time";
 
 /**
  * 返回指定 UTC 输入对应的 TAI - UTC 秒数。
  *
- * @param input UTC 日期时间字段。
+ * @param input UTC 输入边界值对象。
  * @returns TAI - UTC 秒数。
  */
-export type LeapSecondProvider = (input: UtcInstantLike) => number;
+export type LeapSecondProvider = (input: UtcDateTime) => number;
 
 /**
  * 返回指定 Instant 对应的 Delta-T，即 TT - UT1。

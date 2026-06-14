@@ -1,5 +1,9 @@
 /** temporal 包内可识别的结构化错误码。 */
-export type TemporalErrorCode = "InvalidUTCDateTime";
+export type TemporalErrorCode =
+  | "InvalidJulianDay"
+  | "InvalidTimeScaleInput"
+  | "InvalidUTCDateTime"
+  | "MissingDeltaTProvider";
 
 /**
  * 时间模型的结构化错误。

@@ -4,5 +4,7 @@ export type { TemporalErrorCode } from "./errors";
 export { Instant } from "./instant";
 export type { InstantOptions, TimePoint } from "./instant";
 export { JulianDay, JulianEphemerisDay } from "./julian-day";
-export type { DeltaTProvider, LeapSecondProvider, UtcInstantLike } from "./providers";
+export type { DeltaTProvider, LeapSecondProvider } from "./providers";
 export { fixedDeltaT, fixedLeapSeconds } from "./providers";
+export { UtcDateTime } from "./utc-date-time";
+export type { UtcDateTimeFields } from "./utc-date-time";
