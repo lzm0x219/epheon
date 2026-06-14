@@ -1,0 +1,18 @@
+{
+  "conversions": [
+    {
+      "seconds": 86400,
+      "milliseconds": 86400000,
+      "days": 1,
+      "julianYears": 0.0027378507871321013,
+      "julianCenturies": 0.000027378507871321012
+    },
+    {
+      "seconds": 31557600,
+      "milliseconds": 31557600000,
+      "days": 365.25,
+      "julianYears": 1,
+      "julianCenturies": 0.01
+    }
+  ]
+}

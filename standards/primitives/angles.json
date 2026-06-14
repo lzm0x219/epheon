@@ -1,0 +1,35 @@
+{
+  "conversions": [
+    {
+      "degrees": 180,
+      "radians": 3.141592653589793,
+      "turns": 0.5,
+      "arcminutes": 10800,
+      "arcseconds": 648000
+    },
+    {
+      "degrees": 1,
+      "radians": 0.017453292519943295,
+      "turns": 0.002777777777777778,
+      "arcminutes": 60,
+      "arcseconds": 3600
+    }
+  ],
+  "normalization": [
+    {
+      "degrees": 370,
+      "normalizedDegrees": 10,
+      "signedDegrees": 10
+    },
+    {
+      "degrees": -10,
+      "normalizedDegrees": 350,
+      "signedDegrees": -10
+    },
+    {
+      "degrees": 190,
+      "normalizedDegrees": 190,
+      "signedDegrees": -170
+    }
+  ]
+}
