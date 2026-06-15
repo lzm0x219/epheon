@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import angleStandards from "../../../standards/primitives/angles.json";
 import { Angle, PrimitiveError } from "../src";
-import { expectAlmostEqual } from "./helpers";
+import { expectAlmostEqual, expectPrimitiveErrorCode } from "./helpers";
 
 const TOLERANCE = { absolute: 1e-12 };
 
@@ -49,12 +49,36 @@ describe("Angle", () => {
     }
   });
 
+  it("normalizes radians and turns to half-open ranges", () => {
+    const fromRadians = Angle.fromRadians(-Math.PI / 2).normalizeRadians();
+    const fromTurns = Angle.fromTurns(1.25).normalizeTurns();
+
+    expect(fromRadians.toRadians()).toBeGreaterThanOrEqual(0);
+    expect(fromRadians.toRadians()).toBeLessThan(Math.PI * 2);
+    expectAlmostEqual(fromRadians.toDegrees(), 270, TOLERANCE);
+    expect(fromTurns.toTurns()).toBeGreaterThanOrEqual(0);
+    expect(fromTurns.toTurns()).toBeLessThan(1);
+    expectAlmostEqual(fromTurns.toTurns(), 0.25, TOLERANCE);
+  });
+
   it("keeps values immutable during arithmetic", () => {
     const original = Angle.fromDegrees(10);
     const result = original.add(Angle.fromDegrees(20));
 
     expect(original.toDegrees()).toBe(10);
     expectAlmostEqual(result.toDegrees(), 30, TOLERANCE);
+  });
+
+  it("handles arithmetic boundary methods", () => {
+    const angle = Angle.fromDegrees(-30);
+
+    expectAlmostEqual(angle.subtract(Angle.fromDegrees(15)).toDegrees(), -45, TOLERANCE);
+    expectAlmostEqual(angle.multiply(2).toDegrees(), -60, TOLERANCE);
+    expectAlmostEqual(angle.divide(2).toDegrees(), -15, TOLERANCE);
+    expectAlmostEqual(angle.negate().toDegrees(), 30, TOLERANCE);
+    expectAlmostEqual(angle.abs().toDegrees(), 30, TOLERANCE);
+    expect(angle.equals(Angle.fromDegrees(-30))).toBe(true);
+    expect(angle.equals(Angle.fromDegrees(30))).toBe(false);
   });
 
   it("requires explicit tolerance for approximate equality", () => {
@@ -79,5 +103,10 @@ describe("Angle", () => {
     expect(() => Angle.fromDegrees(Number.NaN)).toThrow(PrimitiveError);
     expect(() => Angle.fromRadians(Number.POSITIVE_INFINITY)).toThrow(PrimitiveError);
     expect(() => Angle.fromDegrees(1).divide(0)).toThrow(PrimitiveError);
+  });
+
+  it("reports stable error codes for invalid arithmetic inputs", () => {
+    expectPrimitiveErrorCode(() => Angle.fromDegrees(1).multiply(Number.NaN), "InvalidNumber");
+    expectPrimitiveErrorCode(() => Angle.fromDegrees(1).divide(0), "DivisionByZero");
   });
 });

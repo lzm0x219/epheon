@@ -1,11 +1,39 @@
 {
   "conversions": [
     {
+      "seconds": 0,
+      "milliseconds": 0,
+      "days": 0,
+      "julianYears": 0,
+      "julianCenturies": 0
+    },
+    {
+      "seconds": 1.5,
+      "milliseconds": 1500,
+      "days": 0.00001736111111111111,
+      "julianYears": 4.7532131721043424e-8,
+      "julianCenturies": 4.753213172104343e-10
+    },
+    {
       "seconds": 86400,
       "milliseconds": 86400000,
       "days": 1,
       "julianYears": 0.0027378507871321013,
       "julianCenturies": 0.000027378507871321012
+    },
+    {
+      "seconds": -86400,
+      "milliseconds": -86400000,
+      "days": -1,
+      "julianYears": -0.0027378507871321013,
+      "julianCenturies": -0.000027378507871321012
+    },
+    {
+      "seconds": 43200,
+      "milliseconds": 43200000,
+      "days": 0.5,
+      "julianYears": 0.0013689253935660506,
+      "julianCenturies": 0.000013689253935660506
     },
     {
       "seconds": 31557600,

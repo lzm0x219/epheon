@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import durationStandards from "../../../standards/primitives/durations.json";
 import { Duration, PrimitiveError } from "../src";
-import { expectAlmostEqual } from "./helpers";
+import { expectAlmostEqual, expectPrimitiveErrorCode } from "./helpers";
 
 const TOLERANCE = { absolute: 1e-12 };
 
@@ -36,6 +36,18 @@ describe("Duration", () => {
     expect(result.toSeconds()).toBe(15);
   });
 
+  it("handles arithmetic boundary methods", () => {
+    const duration = Duration.fromSeconds(-30);
+
+    expect(duration.subtract(Duration.fromSeconds(15)).toSeconds()).toBe(-45);
+    expect(duration.multiply(2).toSeconds()).toBe(-60);
+    expect(duration.divide(2).toSeconds()).toBe(-15);
+    expect(duration.negate().toSeconds()).toBe(30);
+    expect(duration.abs().toSeconds()).toBe(30);
+    expect(duration.equals(Duration.fromSeconds(-30))).toBe(true);
+    expect(duration.equals(Duration.fromSeconds(30))).toBe(false);
+  });
+
   it("requires explicit tolerance for approximate equality", () => {
     const a = Duration.fromDays(0.5);
     const b = Duration.fromSeconds(43200);
@@ -58,5 +70,10 @@ describe("Duration", () => {
     expect(() => Duration.fromSeconds(Number.NaN)).toThrow(PrimitiveError);
     expect(() => Duration.fromDays(Number.NEGATIVE_INFINITY)).toThrow(PrimitiveError);
     expect(() => Duration.fromSeconds(1).divide(0)).toThrow(PrimitiveError);
+  });
+
+  it("reports stable error codes for invalid arithmetic inputs", () => {
+    expectPrimitiveErrorCode(() => Duration.fromSeconds(1).multiply(Number.NaN), "InvalidNumber");
+    expectPrimitiveErrorCode(() => Duration.fromSeconds(1).divide(0), "DivisionByZero");
   });
 });
