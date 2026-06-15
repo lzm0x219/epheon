@@ -122,15 +122,15 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | D2.2 — UTC 边界收口             | parseUTC/fromUTC、fromFields、offset 边界均已补。                                    |
 | D2.3 — JulianDay Gregorian 构造 | 继续暂缓，`src/internal/gregorian` 不导出。                                          |
 | D2.4 — provider 错误收敛        | 非有限数值、provider 抛错统一收敛为 TemporalError。                                  |
-| A1 — standards/README.md        | 已写入，含 fixture 维护规范。                                                        |
+| A1 — standards/README.md        | 已补，字段约定修正为实际 fixture schema（原泛型模版与 5 个 fixture 文件结构不符）。  |
 | A2 — conformance/README.md      | 已写入，说明 conformance 边界。                                                      |
 | A3 — benchmarks/README.md       | 已写入，说明第一阶段不引入 benchmark 工具链。                                        |
+| A4 — Vector3                    | 已实现：fromXYZ 构造、add/subtract/dot/cross、magnitude、normalize、equals。         |
 
 ### 第一阶段待执行
 
 | 任务            | 大小 | 说明                                |
 | --------------- | ---- | ----------------------------------- |
-| A4 — Vector3    | M    | primitives 新增三维向量类型         |
 | A5 — Polynomial | S    | primitives 新增 Horner 法多项式求值 |
 | A6 — RootFinder | S    | primitives 新增二分法/Newton 法求根 |
 
@@ -157,129 +157,12 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 
 这几项彼此无依赖，可以并行推进。
 
-### A1：补 `standards/README.md`
-
-说明：标准样例需要有维护规范，否则后续 conformance 很难判断数据来源与误差口径。
-
-验收标准：
-
-- 说明 `standards/primitives/` 与 `standards/temporal/` 的职责。
-- 说明数值样例应记录来源、字段含义和 tolerance。
-- 说明大型数据集进入未来 dataset package，不进入核心包。
-
-验证：
-
-```bash
-CI=true pnpm format:check
-```
-
-可能触达文件：
-
-```txt
-standards/README.md
-```
-
-任务大小：S。
-
----
-
-### A2：补 `conformance/README.md`
-
-说明：`conformance/` 当前只有占位文件。先写清楚它与包内单测的边界。
-
-验收标准：
-
-- 说明 conformance 只验证公共 API 与 standards 的一致性。
-- 说明它不直接导入 `src/internal/*`。
-- 说明未来如何扩展到第三方实现或多语言实现。
-- 第一阶段不纳入 workspace，等出现可执行 conformance runner 再决策。
-
-验证：
-
-```bash
-CI=true pnpm format:check
-```
-
-可能触达文件：
-
-```txt
-conformance/README.md
-```
-
-任务大小：XS。
-
----
-
-### A3：补 `benchmarks/README.md`
-
-说明：benchmark 先记录性能基线，不作为第一阶段优化入口。
-
-验收标准：
-
-- 说明首批 benchmark 范围：Angle、Duration、UTC 解析、JD 转换。
-- 说明 benchmark 结果不作为正确性依据。
-- 说明 benchmark 不进入默认 CI 阻塞链路。
-- 第一阶段不引入 benchmark 工具链，等性能基线要可执行时再走 catalog 决策。
-
-验证：
-
-```bash
-CI=true pnpm format:check
-```
-
-可能触达文件：
-
-```txt
-benchmarks/README.md
-```
-
-任务大小：XS。
-
----
-
-### A4：primitives 新增 Vector3
-
-说明：三维向量是纯数学类型，不包含天文语义，遵循 `Angle`/`Duration` 的既有模式
-即可实现，无需等待 RFC。
-
-API 草案：
-
-```ts
-class Vector3 {
-  static fromXYZ(x: number, y: number, z: number): Vector3;
-  get x(): number;
-  get y(): number;
-  get z(): number;
-  toArray(): [number, number, number];
-  add(other: Vector3): Vector3;
-  subtract(other: Vector3): Vector3;
-  cross(other: Vector3): Vector3;
-  dot(other: Vector3): number;
-  magnitude(): number;
-  normalize(): Vector3;
-  equals(other: Vector3): boolean;
-}
-```
-
-验收标准：
-
-- 构造时拒绝 NaN/Infinity。
-- 加、减、叉积、点积覆盖边界输入。
-- `normalize()` 零向量抛出 DivisionByZero。
-- 测试从 `standards/primitives/` 读取 fixture（新增 vector3 fixture）。
-- 包没有运行时第三方依赖。
-- 导出入口：`packages/primitives/src/index.ts`。
-
-可能触达文件：
-
-```txt
-packages/primitives/src/vector3.ts
-packages/primitives/tests/vector3.test.ts
-packages/primitives/src/index.ts
-standards/primitives/vectors.json
-```
-
-任务大小：M。
+| 任务                       | 状态 | 说明                                                   |
+| -------------------------- | ---- | ------------------------------------------------------ |
+| A1 — standards/README.md   | ✅   | 字段约定修正为实际 fixture schema，原泛型模版已移除。  |
+| A2 — conformance/README.md | ✅   | 已写入，说明 conformance 边界。                        |
+| A3 — benchmarks/README.md  | ✅   | 已写入，说明第一阶段不引入 benchmark 工具链。          |
+| A4 — Vector3               | ✅   | fromXYZ 构造、四则运算、叉积/点积、normalize、equals。 |
 
 ---
 
