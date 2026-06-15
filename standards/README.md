@@ -47,7 +47,7 @@ standards/
 | `normalization[]`                   | 对象数组 | 角度归一化前后的对比     |
 | `normalization[].degrees`           | number   | 原始角度                 |
 | `normalization[].normalizedDegrees` | number   | [0°, 360°) 归一化        |
-| `normalization[].signedDegrees`     | number   | (-180°, 180°] 归约       |
+| `normalization[].signedDegrees`     | number   | [-180°, 180°) 归约       |
 
 ### `primitives/durations.json`
 
