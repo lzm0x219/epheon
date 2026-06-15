@@ -1,0 +1,52 @@
+{
+  "name": "@epheon/dataset-leap-seconds",
+  "version": "0.1.0",
+  "description": "Static leap-second snapshot and provider factory for Epheon.",
+  "homepage": "https://github.com/lzm0x219/epheon/tree/main/packages/dataset-leap-seconds#readme",
+  "bugs": {
+    "url": "https://github.com/lzm0x219/epheon/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "lzm0x219",
+    "email": "lzm0x219@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lzm0x219/epheon.git",
+    "directory": "packages/dataset-leap-seconds"
+  },
+  "files": [
+    "dist/"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs"
+      },
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "dependencies": {
+    "@epheon/temporal": "workspace:*"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "catalog:",
+    "tsdown": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.16.0"
+  }
+}
