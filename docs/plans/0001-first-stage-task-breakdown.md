@@ -94,7 +94,7 @@ CI=true pnpm build
 | D0   | 已完成 | 工程骨架、非交互命令、GitHub CI、README/RFC/API 对齐已收口。                    |
 | D1   | 已完成 | primitives fixture、边界测试和 Interval/Maybe 暂缓决策已收口。                  |
 | D2.1 | 已完成 | temporal standards 已扩展日期、offset、小数秒、时间尺度与非法输入样例。         |
-| D2.2 | 进行中 | parseUTC/fromUTC 和 fromFields 边界已补，UTC offset 解析边界待补。              |
+| D2.2 | 已完成 | parseUTC/fromUTC、fromFields 与 UTC offset 解析边界已补。                       |
 | D2.3 | 已暂缓 | JulianDay 直接 Gregorian 构造 API 第一阶段不进入公共入口。                      |
 | D2.4 | 进行中 | provider 抛错和 NaN 已覆盖，Infinity、PrimitiveError 与 time-scale 窄测试待补。 |
 | D3   | 待执行 | standards、conformance、benchmarks README 骨架待补。                            |
@@ -260,7 +260,7 @@ packages/temporal/tests/time-scale.test.ts
 
 ### Checkpoint T：temporal 收口
 
-完成 D2.2.3 与 D2.4 后运行：
+完成 D2.4 后运行：
 
 ```bash
 CI=true pnpm lint
@@ -429,11 +429,10 @@ CI=true pnpm format:check
 短期最小路径：
 
 ```txt
-1. D2.2.3
-2. D2.4.1
-3. D2.4.2
-4. D2.4.3
-5. Checkpoint T
+1. D2.4.1
+2. D2.4.2
+3. D2.4.3
+4. Checkpoint T
 ```
 
 随后补验证体系文档：

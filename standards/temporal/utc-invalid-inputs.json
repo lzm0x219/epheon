@@ -21,6 +21,16 @@
       "basis": "UTC offset hour is out of range."
     },
     {
+      "input": "2000-01-01T12:00:00+00:60",
+      "code": "InvalidUTCDateTime",
+      "basis": "UTC offset minute is out of range."
+    },
+    {
+      "input": "2000-01-01T12:00:00+0000",
+      "code": "InvalidUTCDateTime",
+      "basis": "UTC offset is missing the required colon."
+    },
+    {
       "input": "2016-12-31T23:59:60Z",
       "code": "InvalidUTCDateTime",
       "basis": "Leap second field is deferred in the first-stage UTC boundary."
