@@ -8,12 +8,12 @@
 第一阶段目标：
 
 ```txt
-@epheon/primitives  —— 已完成
-@epheon/temporal    —— 已完成
-standards/          —— 文档骨架待补，fixture 已有
-conformance/        —— 目录占位，README 待补
-benchmarks/         —— 目录占位，README 待补
-工程验证链路         —— 已完成
+|@epheon/primitives  —— 已完成
+|@epheon/temporal    —— 已完成
+|standards/          —— 已完成（含 README 与 fixture）
+|conformance/        —— 已完成（README 已补）
+|benchmarks/         —— 已完成（README 已补）
+|工程验证链路         —— 已完成
 ```
 
 当前不进入：
@@ -122,17 +122,17 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | D2.2 — UTC 边界收口             | parseUTC/fromUTC、fromFields、offset 边界均已补。                                    |
 | D2.3 — JulianDay Gregorian 构造 | 继续暂缓，`src/internal/gregorian` 不导出。                                          |
 | D2.4 — provider 错误收敛        | 非有限数值、provider 抛错统一收敛为 TemporalError。                                  |
+| A1 — standards/README.md        | 已写入，含 fixture 维护规范。                                                        |
+| A2 — conformance/README.md      | 已写入，说明 conformance 边界。                                                      |
+| A3 — benchmarks/README.md       | 已写入，说明第一阶段不引入 benchmark 工具链。                                        |
 
 ### 第一阶段待执行
 
-| 任务                       | 大小 | 说明                                |
-| -------------------------- | ---- | ----------------------------------- |
-| A1 — standards/README.md   | S    | 说明 fixture 维护规范               |
-| A2 — conformance/README.md | XS   | 说明 conformance 与单测的边界       |
-| A3 — benchmarks/README.md  | XS   | 说明性能基线范围                    |
-| A4 — Vector3               | M    | primitives 新增三维向量类型         |
-| A5 — Polynomial            | S    | primitives 新增 Horner 法多项式求值 |
-| A6 — RootFinder            | S    | primitives 新增二分法/Newton 法求根 |
+| 任务            | 大小 | 说明                                |
+| --------------- | ---- | ----------------------------------- |
+| A4 — Vector3    | M    | primitives 新增三维向量类型         |
+| A5 — Polynomial | S    | primitives 新增 Horner 法多项式求值 |
+| A6 — RootFinder | S    | primitives 新增二分法/Newton 法求根 |
 
 ### 第二阶段待执行
 
@@ -328,16 +328,21 @@ export function bisect(
   target: number,
   left: number,
   right: number,
-  tolerance: number
+  options?: {
+    tolerance?: number; // 收敛容差，默认 1e-10
+    maxIterations?: number; // 最大迭代次数，默认 100
+  }
 ): number;
 ```
 
 验收标准：
 
-- 给定单调函数 f 和目标值 target，在 [left, right] 区间查找 x 使 f(x) ≈ target。
-- `left` 和 `right` 符号不同（bracket 条件）。
+- 给定单调函数 f 和目标值 target，在 [left, right] 区间查找 x 使 `f(x) ≈ target`。
+- `f(left) - target` 与 `f(right) - target` 必须异号（bracket 条件），否则抛出
+  `PrimitiveError(DivisionByZero)`。
 - 收敛条件为区间宽度 < tolerance。
-- 最多迭代 100 次以防止不收敛。
+- 超过 maxIterations 仍未收敛时抛出 Error。
+- 测试覆盖：线性函数、VSOP87 多项式风格的三角函数、空区间、无效 bracket。
 - 不导出到公共入口。
 
 可能触达文件：
@@ -500,9 +505,13 @@ packages/reference/
 
 验收标准：
 
+- 代码风格和目录结构遵循 `packages/primitives/` 的现有模板（`moon.yml`、`tsdown.config.ts`、`package.json`）。
+- 依赖 `@epheon/primitives` 与 `@epheon/temporal`，按需只从入口 `index.ts` 导入。
 - 包构建通过。
 - 类型定义通过 typecheck。
-- 值对象不可变，提供 parse/from 双层 API。
+- 值对象不可变，提供 `fromXxx` / `parseXxx` 双层 API，公共方法使用中文 TSDoc。
+- 测试使用 `expectAlmostEqual` helper（从现有 `packages/*/tests/helpers.ts` 模式照搬）。
+- 测试优先读取 `standards/` fixture，不硬编码标准数值。
 - 更新 `pnpm-workspace.yaml`（如需要，将 `packages/reference` 加入 workspace）。
 - 根 `vitest.config.ts` 自动发现测试（workspace projects 模式）。
 
@@ -531,8 +540,10 @@ packages/ephemerides/
 
 验收标准：
 
-- `EphemerisProvider` 接口定义完整。
+- 代码风格和目录结构遵循 `packages/primitives/` 的现有模板。
+- `EphemerisProvider` 接口定义完整，包含 `position()` 方法签名和返回类型。
 - `Precision` 等级枚举 / union 定义完整。
+- 依赖 `@epheon/reference` 与 `@epheon/temporal`，只从入口 `index.ts` 导入。
 - 包构建通过，类型检查通过。
 - 不包含任何具体算法实现。
 
@@ -668,23 +679,46 @@ packages/phenomena/
 来验证实现。这是 Epheon 正确性的**根本前提**——没有 reference data 就无法知道
 算法算得对不对。
 
-候选参考源：
+推荐验证策略：
 
 ```txt
-JPL Horizons（https://ssd.jpl.nasa.gov/horizons/）— 官方星历
-Skyfield（Python）— VSOP87 封装，可脚本化
-PyEphem（Python）— 轻量
-NOAA Solar Calculator — 节气时刻
-中国科学院紫金山天文台历书 — 官方农历数据
+太阳黄经验证:
+  Skyfield（Python）—— 使用 VSOP87 的高精度 Python 封装，
+  输入 JDE 输出黄经，用于验证 C4 的 IAU 2006 多项式。
+  脚本: scripts/fetch-standards/solar-longitudes.py
+
+节气时刻验证:
+  Skyfield + 二分法求解，生成 2000-2050 年 24 气时刻。
+  与 NOAA Solar Calculator 交叉验证若干标志年份。
+  脚本: scripts/fetch-standards/solar-terms.py
+
+朔望时刻验证:
+  Skyfield 的 phase 功能或 JPL Horizons API。
+  脚本: scripts/fetch-standards/lunar-phases.py
+```
+
+输出格式：每个脚本生成一个独立 JSON fixture 文件放在 `standards/` 下，
+符合 `standards/README.md` 定义的 schema：
+
+```json
+{
+  "description": "用例说明",
+  "input": { ... },
+  "expected": value,
+  "tolerance": { "absolute": number, "relative?": number },
+  "source": "数据来源说明"
+}
 ```
 
 验收标准：
 
-- 确定主参考源（建议 JPL Horizons API + Skyfield 双重验证）。
-- 编写一次性脚本（`scripts/fetch-standards/`）拉取参考数据。
+- 确定主参考源（**建议 Skyfield + JPL Horizons 双重验证**）。
+- 编写可复现的一次性脚本放入 `scripts/fetch-standards/` 目录。
 - 输出为 `standards/` 下的 JSON fixture。
-- 脚本不纳入核心包，不走 pnpm workspace，单独放在 `scripts/` 目录。
+- 脚本不纳入核心包，不走 pnpm workspace，不参加 CI。
+- 脚本运行环境在 README 中说明（Python 3 + `skyfield` + `astropy` 等）。
 - 不在此任务中向 `packages/` 写入代码。
+- 2024 年和 2025 年的节气时刻是首批必须 fixture。
 
 验证：脚本可复现执行，生成的 fixture 格式符合 `standards/README.md` 规范。
 
@@ -699,13 +733,10 @@ NOAA Solar Calculator — 节气时刻
 ### 立即启动（无需等待任何人）
 
 ```txt
-[A1]  standards/README.md
-[A2]  conformance/README.md
-[A3]  benchmarks/README.md
-[A4]  primitives Vector3
-[A5]  primitives Polynomial
-[A6]  primitives RootFinder
-[D1]  参考数据 bootstrap 脚本
+[A4]  primitives Vector3       —— 已有 exact 实现模板
+[A5]  primitives Polynomial    —— 内部算法，无需 RFC
+[A6]  primitives RootFinder    —— 内部算法，无需 RFC
+[D1]  参考数据 bootstrap 脚本  —— 使用 Skyfield 生成 fixture
 [B4]  Delta-T 与闰秒数据模型 RFC  —— 可与 A 路并行起草
 ```
 
@@ -735,7 +766,7 @@ NOAA Solar Calculator — 节气时刻
 ```txt
 三路并行，不等 RFC 锁死：
 
-A 路：文档 + 纯数学扩展 —— 现在就能写
+A 路：纯数学扩展（Vector3、Polynomial、RootFinder）—— 现在就能写
 B 路：四个 RFC 起草 —— 需要决策，但不阻塞 A
 C 路：包实现 —— 等待 B 路定稿
 D 路：参考数据 —— 优先级最高，不然算出来也不知道对不对
