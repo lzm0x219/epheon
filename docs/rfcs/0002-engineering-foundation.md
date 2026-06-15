@@ -21,8 +21,6 @@
 可长期维护
 ```
 
----
-
 ## 二、阶段范围
 
 本文只覆盖第一阶段。
@@ -49,8 +47,6 @@ Playground
 
 这些能力应在后续 RFC 或阶段计划中展开。
 
----
-
 ## 三、仓库形态
 
 Epheon 采用 monorepo。
@@ -63,6 +59,7 @@ epheon/
 │  └─ rfcs/
 ├─ AGENTS.md
 ├─ package.json
+├─ README.md
 ├─ LICENSE
 ├─ pnpm-lock.yaml
 ├─ pnpm-workspace.yaml
@@ -72,6 +69,8 @@ epheon/
 ├─ .gitignore
 ├─ .github/
 │  └─ renovate.json
+├─ .changeset/
+├─ .moon/
 ├─ .oxlintrc.json
 ├─ .oxfmtrc.json
 └─ lefthook.yml
@@ -97,13 +96,15 @@ epheon/
 ```txt
 packages/primitives/
 packages/temporal/
+standards/primitives/
+standards/temporal/
 ```
 
 它们已经包含 package、TypeScript、tsdown、Moonrepo 配置，以及第一批最小 `src/index.ts` 实现和单元测试。
 
-第一阶段可以暂不创建所有最终目录，但根目录结构和 workspace 配置应为后续包预留空间。
+`standards/` 已经包含 primitives 与 temporal 的 JSON fixture。`conformance/` 与 `benchmarks/` 已创建为空目录，保留给后续验证与性能基线工作；`apps/` 仍未创建，保留为后续阶段目录。
 
----
+第一阶段可以暂不创建所有最终目录，但根目录结构和 workspace 配置应为后续包预留空间。
 
 ## 四、包管理器
 
@@ -161,8 +162,6 @@ allowBuilds:
 ```
 
 这是为了允许 Lefthook 运行安装期构建脚本。
-
----
 
 ## 五、语言与模块格式
 
@@ -226,8 +225,6 @@ noUncheckedIndexedAccess: true
 
 如果后续发现双格式输出增加维护成本，可以通过独立 RFC 收缩为 ESM-only。
 
----
-
 ## 六、构建工具
 
 使用 `tsdown` 构建包。
@@ -240,7 +237,7 @@ pnpm catalog 已声明 tsdown 0.22.2。
 根 package.json 已提供 build 脚本。
 packages/primitives 与 packages/temporal 已声明 tsdown devDependency。
 packages/primitives 与 packages/temporal 已包含 tsdown.config.ts。
-当前 package 已包含 src/index.ts，因此构建任务可以完整运行。
+当前 package 已包含 src/index.ts、领域类型实现、internal 辅助模块和单元测试，因此构建任务可以完整运行。
 ```
 
 原因：
@@ -261,6 +258,10 @@ packages/primitives 与 packages/temporal 已包含 tsdown.config.ts。
 {
   "scripts": {
     "build": "pnpm moon run :build",
+    "coverage": "vitest run --coverage",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint",
     "typecheck": "tsgo --noEmit",
     "test": "vitest"
   }
@@ -269,7 +270,17 @@ packages/primitives 与 packages/temporal 已包含 tsdown.config.ts。
 
 当前根 `test` 脚本已通过 Vitest workspace projects 运行所有包测试。
 
----
+本地非交互环境和 CI 中推荐显式使用：
+
+```bash
+CI=true pnpm test
+CI=true pnpm typecheck
+CI=true pnpm build
+```
+
+原因是 pnpm 在非 TTY 场景下可能因模块目录清理确认而失败。当前阶段不额外引入
+npm、Yarn、Bun lockfile，也不通过新增脚本包装 `CI=true`，保持根命令与本地交互
+使用方式一致。
 
 ## 七、测试框架
 
@@ -332,8 +343,6 @@ standards/
 
 包级单元测试可以读取 `standards/` 下对应领域的 JSON fixture。角度、时长、Julian Day、TT/JDE、UT1 offset 和 Delta-T 等稳定样例不应散落硬编码在多个测试文件中；只有非常局部的边界输入才允许直接写在测试用例里。
 
----
-
 ## 八、代码规范
 
 第一阶段采用：
@@ -393,7 +402,7 @@ format
 type check
 ```
 
-注意：当前 `lefthook.yml` 中的 hook 命令使用 `bun oxlint` 和 `bun oxfmt`。这只是本地 hook 执行方式，不代表核心包支持 Bun 运行时。
+这些 hook 当前通过 `pnpm exec oxlint` 与 `pnpm exec oxfmt` 执行，并启用 `stage_fixed: true` 自动重新暂存修复后的文件。
 
 要求：
 
@@ -433,8 +442,6 @@ code review
 
 共同保证。
 
----
-
 ## 九、依赖策略
 
 核心包应尽量少依赖。
@@ -464,7 +471,7 @@ vitest
 ```txt
 @moonrepo/cli: 2.3.3
 @vitest/coverage-v8: 4.1.8
-@types/node: 25.5.2
+@types/node: 25.9.3
 @typescript/native-preview: 7.0.0-dev.20260614.1
 @changesets/cli: 3.0.0-next.5
 @changesets/types: 6.1.0
@@ -512,8 +519,6 @@ core package -> cli
 core package -> playground
 ```
 
----
-
 ## 十、发布策略
 
 使用 Changesets 管理版本与发布。
@@ -523,6 +528,8 @@ core package -> playground
 ```txt
 Changesets 依赖已在 package.json 中声明。
 .changeset/ 已初始化。
+.changeset/config.json 已将 @epheon/primitives 与 @epheon/temporal 设为 linked package。
+.changeset/changelog-generator.ts 已配置仓库为 lzm0x219/epheon，用于生成 PR 链接。
 packages/primitives 与 packages/temporal 已具备可发布 package 的基础元数据。
 当前 package 已包含最小源码，构建产物由 tsdown 生成到 dist/，并由 .gitignore 忽略。
 ```
@@ -552,26 +559,26 @@ files
 
 子包不需要 `scripts` 字段；构建入口在 `moon.yml` 中声明，测试入口使用根 `pnpm test`。
 
----
-
 ## 十一、CI 策略
 
 第一阶段 CI 最终至少执行：
 
 ```txt
 pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm test
-pnpm build
+CI=true pnpm lint
+CI=true pnpm format:check
+CI=true pnpm typecheck
+CI=true pnpm test
+CI=true pnpm build
 ```
 
 当前状态：
 
 ```txt
-尚未添加 CI 配置。
-.github/ 目录当前只有 renovate.json。
-根 package.json 已提供 build/typecheck/test/lint/format/format:check 脚本。
-CI workflow 暂缓创建。
+.github/workflows/ci.yml 已添加。
+CI 在 pull request 与 main 分支 push 时运行。
+CI 使用 Node.js 24、Corepack 与 pnpm install --frozen-lockfile。
+根 package.json 已提供 build/typecheck/test/coverage/lint/format/format:check 脚本。
 ```
 
 后续再增加：
@@ -604,8 +611,6 @@ standards/temporal/
 
 其中 `standards/temporal/` 当前包含 Julian Day 与时间尺度转换 fixture。这些 fixture 是测试与未来 conformance 的共同输入，不属于核心包运行时代码。
 
----
-
 ## 十二、运行时支持
 
 第一阶段优先支持：
@@ -635,8 +640,6 @@ Node 专属 API
 隐式网络请求
 依赖系统时区
 ```
-
----
 
 ## 十三、第一阶段最小交付
 
@@ -670,6 +673,15 @@ TT 表达
 ΔT provider 接口
 ```
 
+当前进展：
+
+```txt
+@epheon/primitives 已实现 Angle、Duration、Result、PrimitiveError、Tolerance 与 almostEqual。
+@epheon/temporal 已实现 Instant、JulianDay、JulianEphemerisDay、UtcDateTime、TemporalError、DeltaTProvider、LeapSecondProvider、fixedDeltaT 与 fixedLeapSeconds。
+两个包的公共 API 都从 src/index.ts 导出，internal 辅助模块没有从主入口导出。
+temporal 通过 workspace:* 依赖 primitives，primitives 不包含运行时第三方依赖。
+```
+
 最小验证：
 
 ```txt
@@ -678,8 +690,6 @@ TT 表达
 已知 JD 样例
 误差容忍工具
 ```
-
----
 
 ## 十四、暂缓决策
 
@@ -709,34 +719,16 @@ packages/temporal/moon.yml
 
 过早绑定会增加维护成本。
 
----
+## 十五、落地状态与计划边界
 
-## 十五、实施顺序
+本文记录第一阶段工程化基础的稳定决策、约束和当前状态，不维护逐项实施清单。
 
-当前已完成：
+当前项目已经进入第一阶段实现期，工程骨架可以支持继续扩展核心领域能力。
 
-```txt
-1. 初始化 pnpm workspace
-2. 添加 TypeScript 基础配置
-3. 添加 Vitest
-4. 添加 pnpm catalog
-5. 添加 Oxlint
-6. 添加 Oxfmt
-7. 添加 Lefthook
-8. 声明 Changesets 依赖
-```
-
-下一步建议：
+后续任务拆分、验收标准和推荐执行顺序由计划文档维护：
 
 ```txt
-1. 替换根 package.json 的占位 test 脚本
-2. 添加 build/typecheck/lint/format 脚本
-3. 将 tsdown 加入实际 devDependencies 或包级依赖
-4. 初始化 .changeset/
-5. 创建 @epheon/primitives
-6. 创建 @epheon/temporal
-7. 添加基础测试
-8. 添加 CI
+docs/plans/0001-first-stage-task-breakdown.md
 ```
 
-完成后，项目可以进入第一阶段实现。
+如果后续任务改变包管理器、构建工具、测试框架、发布策略、运行时支持矩阵或核心包边界，应先更新本文或新增 RFC，再落到计划与实现中。

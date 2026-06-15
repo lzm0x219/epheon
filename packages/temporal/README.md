@@ -79,7 +79,8 @@ const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
 });
 ```
 
-未提供 `leapSeconds` 时默认按 0 处理（适用于不需要高精度 TT 的场景）。
+`toTT()`、`toJulianEphemerisDay()` 和 `toUT1()` 都依赖 TT-UTC，因此必须显式提供
+`leapSeconds`。如果只调用 `toJulianDay()`，则不需要该 provider。
 
 ### 注入 Delta-T provider
 
@@ -109,7 +110,9 @@ instant.toUT1().offsetFromUtc.toSeconds(); // 32 + 32.184 - 64
 | `toUTCFields()`          | `UtcDateTimeFields`  | 解析后的 UTC 字段副本                           |
 
 ```ts
-const instant = Instant.fromUTC("2000-01-01T12:00:00Z");
+const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
+  leapSeconds: fixedLeapSeconds(32)
+});
 
 instant.toJulianDay().toNumber(); // 2451545
 instant.toJulianEphemerisDay().toNumber(); // 2451545 + 闰秒偏移
@@ -227,6 +230,7 @@ class TemporalError extends Error {
     | "InvalidJulianDay"
     | "InvalidTimeScaleInput"
     | "InvalidUTCDateTime"
+    | "MissingLeapSecondProvider"
     | "MissingDeltaTProvider";
   readonly name: "TemporalError";
 }
@@ -234,12 +238,13 @@ class TemporalError extends Error {
 
 当前错误码：
 
-| 错误码                  | 触发场景                                                                       |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| `InvalidJulianDay`      | Julian Day 或 Julian Ephemeris Day 输入不是有限数                              |
-| `InvalidTimeScaleInput` | 时间尺度 provider 返回或抛出无法用于计算的值                                   |
-| `InvalidUTCDateTime`    | UTC 输入缺少 offset、日期格式非法、Gregorian 日期不存在（如 2 月 29 日非闰年） |
-| `MissingDeltaTProvider` | 调用 `toUT1()` 但构造 `Instant` 时未注入 Delta-T provider                      |
+| 错误码                      | 触发场景                                                                           |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| `InvalidJulianDay`          | Julian Day 或 Julian Ephemeris Day 输入不是有限数                                  |
+| `InvalidTimeScaleInput`     | 时间尺度 provider 返回或抛出无法用于计算的值                                       |
+| `InvalidUTCDateTime`        | UTC 输入缺少 offset、日期格式非法、Gregorian 日期不存在或第一阶段闰秒输入          |
+| `MissingLeapSecondProvider` | 调用 `toTT()`、`toJulianEphemerisDay()` 或 `toUT1()` 但未注入 leap second provider |
+| `MissingDeltaTProvider`     | 调用 `toUT1()` 但构造 `Instant` 时未注入 Delta-T provider                          |
 
 抛异常式 API 会直接抛出 `TemporalError`；解析式 API 会将其放入 `Result` 的 `Err` 分支。
 
@@ -249,6 +254,7 @@ class TemporalError extends Error {
 
 - TDB 等其他时间尺度
 - 真实闰秒表（目前只支持固定值 provider）
+- 闰秒输入边界（例如 `23:59:60`，第一阶段先拒绝）
 - 真实 ΔT 历史数据表
 - 时区数据库（如 IANA tzdata）
 - 历史历法改革前后的区域民用日期

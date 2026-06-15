@@ -32,7 +32,7 @@ Epheon 不回答这类问题：
 
 ## 当前状态
 
-Epheon 目前处于架构设计与工程基础阶段。
+Epheon 目前处于第一阶段工程基线与核心包打磨阶段。
 
 当前仓库状态：
 
@@ -43,9 +43,15 @@ docs/rfcs/0003-temporal-model.md
 docs/rfcs/0004-primitives-api.md
 packages/primitives/
 packages/temporal/
+standards/primitives/
+standards/temporal/
+.github/workflows/ci.yml
 ```
 
-当前已经具备第一批最小源码、测试和构建配置。`@epheon/primitives` 已包含角度、时长、Result 与 tolerance 基础能力；`@epheon/temporal` 已包含 Julian Day、Instant 与 provider 骨架。
+当前已经具备第一批最小源码、标准 fixture、测试、构建配置与 GitHub CI。
+`@epheon/primitives` 已包含角度、时长、Result 与 tolerance 基础能力；
+`@epheon/temporal` 已包含 Julian Day、Julian Ephemeris Day、UTC 输入边界、
+Instant、TT/UT1 表达与 provider 骨架。
 
 ## 架构
 
@@ -121,6 +127,16 @@ explicit precision and tolerance rules
 
 当前已完成其中的最小工程版本，用于验证 API 风格和构建链路。后续还需要继续扩展错误模型、标准样例、Delta-T 数据模型和更完整的时间尺度转换。
 
+当前公共 API 边界：
+
+```txt
+@epheon/primitives: Angle, Duration, Result, Tolerance, PrimitiveError
+@epheon/temporal: Instant, JulianDay, JulianEphemerisDay, UtcDateTime, provider 类型与固定 provider helper, TemporalError
+```
+
+`@epheon/primitives` 暂未导出 Interval 或 Maybe。`@epheon/temporal` 暂未导出
+Gregorian 辅助函数、UTC 字符串解析器、时间常量或其他 `src/internal/` 实现细节。
+
 第一阶段有意排除：
 
 ```txt
@@ -154,15 +170,27 @@ Changesets
 
 ```bash
 pnpm install --frozen-lockfile
+pnpm lint
+pnpm format:check
+pnpm typecheck
 pnpm test
-pnpm exec oxlint
-pnpm exec oxfmt --check .
+pnpm build
 pnpm exec lefthook run pre-commit
 pnpm exec moon run :build
 pnpm exec changeset
 ```
 
+本地非交互环境和 CI 中推荐显式设置 `CI=true`，避免 pnpm 在非 TTY
+环境触发模块清理确认：
+
+```bash
+CI=true pnpm test
+CI=true pnpm typecheck
+CI=true pnpm build
+```
+
 当前根命令已可用于验证第一阶段包的构建、测试、类型检查、lint 与格式化状态。
+GitHub CI 已在 pull request 与 `main` 分支 push 时运行同一组核心检查。
 
 ## 设计原则
 
@@ -205,6 +233,17 @@ provider 注入外部数据
 ```
 
 如果新的架构决策会影响公共 API、包边界、精度策略、验证数据或长期兼容性，应先写入 RFC，再进入实现。
+
+## 阶段计划
+
+当前第一阶段任务拆分见：
+
+```txt
+docs/plans/0001-first-stage-task-breakdown.md
+```
+
+该计划根据当前代码、RFC、标准 fixture 和验证结果整理，优先收口工程骨架、
+`@epheon/primitives`、`@epheon/temporal` 与验证体系，再进入星历、天象和中国历法。
 
 ## 许可证
 

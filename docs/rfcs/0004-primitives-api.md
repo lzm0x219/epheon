@@ -6,8 +6,6 @@
 
 `@epheon/primitives` 是 Epheon 的最底层包。它只提供数学、单位、误差和结果表达能力，不包含任何天文或历法语义。
 
----
-
 ## 二、设计边界
 
 `@epheon/primitives` 可以包含：
@@ -42,8 +40,6 @@ New moon
 
 这些能力属于后续阶段或更高层 package。
 
----
-
 ## 三、核心原则
 
 基础类型必须遵守：
@@ -62,8 +58,6 @@ New moon
 ```
 
 `@epheon/primitives` 是下游所有包的共同语言。它应该小、稳定、可预测。
-
----
 
 ## 四、Angle
 
@@ -130,8 +124,6 @@ normalizeSignedDegrees: [-180, 180)
 
 原因是原始角度可能有语义，例如累计转角或差值。
 
----
-
 ## 五、Duration
 
 `Duration` 表示时间长度。
@@ -182,8 +174,6 @@ duration.toJulianCenturies(): number
 
 这些不是固定长度单位。
 
----
-
 ## 六、Interval
 
 `Interval` 表示一维数值区间。
@@ -207,8 +197,6 @@ length
 ```
 
 `Interval` 不应知道时间、角度或历法。
-
----
 
 ## 七、Precision 与 Tolerance
 
@@ -240,8 +228,6 @@ DAY_TOLERANCE
 ```
 
 但 `@epheon/primitives` 不应该知道这些命名。
-
----
 
 ## 八、Result
 
@@ -283,8 +269,6 @@ fromXxx -> throw on invalid input
 
 具体命名可在实现时验证。
 
----
-
 ## 九、Maybe
 
 `Maybe` 第一阶段可以暂缓。
@@ -298,8 +282,6 @@ type Maybe<T> = T | null;
 不要引入复杂 Option monad。
 
 Epheon 的错误多半需要携带原因，因此 `Result` 比 `Maybe` 更重要。
-
----
 
 ## 十、不可变值对象
 
@@ -352,8 +334,6 @@ almostEqual(a, b, tolerance);
 
 不要把算法实现藏在带有隐式状态的对象里。
 
----
-
 ## 十一、数值有效性
 
 构造基础值对象时应拒绝：
@@ -379,8 +359,6 @@ Angle.unsafeFromRadians(value: number): Angle
 ```
 
 是否暴露 unsafe API 需要实现时谨慎决定。
-
----
 
 ## 十二、运算能力
 
@@ -414,8 +392,6 @@ almostEquals
 
 不要提供隐式默认容忍度。
 
----
-
 ## 十三、导出结构
 
 第一阶段入口：
@@ -423,10 +399,27 @@ almostEquals
 ```ts
 export { Angle } from "./angle";
 export { Duration } from "./duration";
+export { PrimitiveError } from "./errors";
+export type { PrimitiveErrorCode } from "./errors";
 export type { Result, Ok, Err } from "./result";
 export { ok, err, isOk, isErr } from "./result";
 export type { Tolerance } from "./tolerance";
 export { almostEqual } from "./tolerance";
+```
+
+`Angle` 与 `Duration` 的公共构造应同时提供 `fromXxx` 和 `parseXxx` 风格：
+
+```txt
+fromXxx: 输入非法时抛出 PrimitiveError。
+parseXxx: 输入非法时返回 Result<..., PrimitiveError>。
+```
+
+`PrimitiveErrorCode` 第一阶段至少包含：
+
+```txt
+DivisionByZero
+InvalidNumber
+InvalidTolerance
 ```
 
 内部文件结构建议：
@@ -435,6 +428,7 @@ export { almostEqual } from "./tolerance";
 src/
 ├─ angle.ts
 ├─ duration.ts
+├─ errors.ts
 ├─ internal/
 │  └─ number.ts
 ├─ result.ts
@@ -458,8 +452,6 @@ standards/primitives/
 
 测试优先读取这些 fixture，避免同一类标准数值在多个测试文件里重复硬编码。
 
----
-
 ## 十四、与 temporal 的关系
 
 `@epheon/temporal` 可以依赖：
@@ -482,8 +474,6 @@ LeapSecondProvider
 ```
 
 如果某个类型看起来既能放入 primitives，也能放入 temporal，默认放入 temporal，直到证明它足够通用。
-
----
 
 ## 十五、验收标准
 

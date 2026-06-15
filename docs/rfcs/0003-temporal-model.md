@@ -16,8 +16,6 @@ Delta-T 如何进入计算？
 
 第一阶段目标不是实现完整天文学时间系统，而是建立一个足够稳定、可扩展、可验证的时间内核。
 
----
-
 ## 二、设计边界
 
 `@epheon/temporal` 负责：
@@ -48,8 +46,6 @@ Luxon / Day.js / date-fns 适配
 
 外部日期库适配属于未来的 `@epheon/compat`。
 
----
-
 ## 三、核心原则
 
 时间模型必须遵守：
@@ -64,8 +60,6 @@ Luxon / Day.js / date-fns 适配
 ```
 
 这些约束是为了让历法结果可复现。
-
----
 
 ## 四、Instant
 
@@ -106,8 +100,6 @@ const jde = instant.toJulianEphemerisDay();
 
 时间尺度转换的核心逻辑应优先实现为纯函数，再由 `Instant` 方法作为易用封装调用。
 
----
-
 ## 五、Julian Day
 
 Julian Day 是 `@epheon/temporal` 的基础能力之一。
@@ -116,9 +108,9 @@ Julian Day 是 `@epheon/temporal` 的基础能力之一。
 
 ```txt
 JD number
-JDN integer
-JD from Gregorian civil date
-Gregorian civil date from JD
+JDE number
+UTC input to JD
+UTC input to JDE
 ```
 
 命名建议：
@@ -139,7 +131,9 @@ JDE 表示以 TT 为时间尺度的 Julian Ephemeris Day。
 
 不要把 JD 与 JDE 混用。
 
----
+Gregorian civil date 与 Julian Day 的互转可以作为内部实现存在，用于支撑 UTC
+输入解析与测试。是否暴露 `JulianDay.fromGregorian(...)` 或从 JD 反解 Gregorian
+日期的公共 API，留到后续 API 收敛时再决策。
 
 ## 六、UTC
 
@@ -163,8 +157,6 @@ YYYY-MM-DDTHH:mm:ss-05:00
 ```
 
 因为它没有明确 offset。
-
----
 
 ## 七、TAI 与闰秒
 
@@ -193,8 +185,6 @@ const provider = fixedLeapSeconds(37);
 @epheon/dataset-leap-seconds
 ```
 
----
-
 ## 八、TT
 
 TT 是许多天文公式的输入尺度。
@@ -220,8 +210,6 @@ instant.toJulianEphemerisDay();
 ```
 
 不要让用户通过普通 `toJulianDay()` 隐式得到 JDE。
-
----
 
 ## 九、UT1 与 Delta-T
 
@@ -255,8 +243,6 @@ Provider 可以来自：
 `Instant.toUT1()`。未注入 Delta-T provider 时调用 `toUT1()` 必须抛出
 `TemporalError`，错误码为 `MissingDeltaTProvider`。
 
----
-
 ## 十、时间尺度转换
 
 第一阶段支持的转换方向：
@@ -281,8 +267,6 @@ TDB
 
 这些能力在后续阶段通过独立 RFC 设计。
 
----
-
 ## 十一、日期解析
 
 第一阶段只接受显式 offset 的 ISO-like 字符串。
@@ -300,8 +284,6 @@ TDB
 ```
 
 错误输入应返回明确错误，而不是自动猜测。
-
----
 
 ## 十二、精度策略
 
@@ -341,8 +323,6 @@ standards/temporal/
 
 包级测试优先读取这些 fixture，再针对局部错误边界补少量内联用例。
 
----
-
 ## 十三、错误模型
 
 时间模型错误应可区分。
@@ -353,6 +333,7 @@ standards/temporal/
 InvalidJulianDay
 InvalidTimeScaleInput
 InvalidUTCDateTime
+MissingLeapSecondProvider
 MissingDeltaTProvider
 ```
 
@@ -365,7 +346,9 @@ Provider 属于外部注入边界。闰秒或 Delta-T provider 抛错、返回 `
 `Infinity` 或其他非法时间尺度输入时，公共 API 必须收敛为 `TemporalError`，
 错误码为 `InvalidTimeScaleInput`。
 
----
+UTC 转 JD 只依赖显式 offset 与 Gregorian 校验，不需要闰秒数据。UTC 转 TAI、TT、
+JDE 或 UT1 时需要闰秒数据。调用相关能力但未注入 `LeapSecondProvider` 时，
+公共 API 必须抛出或返回 `MissingLeapSecondProvider`。
 
 ## 十四、最小 API 草案
 
@@ -444,8 +427,6 @@ interface DeltaTProvider {
 ```
 
 实现前可以根据 `@epheon/primitives` 的错误模型、不可变值对象约定和 provider 元数据需求微调。
-
----
 
 ## 十五、验收标准
 

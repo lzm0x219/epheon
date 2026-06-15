@@ -21,7 +21,8 @@ Epheon 目前处于工程骨架阶段。现有文档位于 `docs/rfcs/`，文件
 在仓库根目录使用 `pnpm`。当前 `package.json` 已接入 `build`、`typecheck`、`test`、`lint`、`format` 与 `format:check` 脚本。
 
 - `pnpm install --frozen-lockfile`：按 lockfile 安装依赖。
-- `pnpm test`：使用根 Vitest 配置聚合运行所有包测试。
+- `pnpm test`：使用根 Vitest 配置聚合运行所有包测试；本地非交互环境建议使用 `CI=true pnpm test`。
+- `pnpm typecheck`：使用根 TypeScript 配置执行类型检查；本地非交互环境建议使用 `CI=true pnpm typecheck`。
 - `pnpm exec oxlint`：使用 Oxlint 检查代码。
 - `pnpm exec oxfmt --check .`：使用 Oxfmt 检查格式。
 - `pnpm exec lefthook run pre-commit`：手动运行 pre-commit 检查。
