@@ -7,3 +7,4 @@ export type { Err, Ok, Result } from "./result";
 export { err, isErr, isOk, ok } from "./result";
 export type { Tolerance } from "./tolerance";
 export { almostEqual } from "./tolerance";
+export { Vector3 } from "./vector3";
