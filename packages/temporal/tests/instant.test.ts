@@ -1,4 +1,4 @@
-import { Duration } from "@epheon/primitives";
+import { Duration, PrimitiveError } from "@epheon/primitives";
 import { describe, expect, it } from "vitest";
 import julianDayStandards from "../../../standards/temporal/julian-days.json";
 import timeScaleStandards from "../../../standards/temporal/time-scales.json";
@@ -237,24 +237,30 @@ describe("Instant", () => {
   });
 
   it("wraps Delta-T provider failures as TemporalError", () => {
-    const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
-      leapSeconds: fixedLeapSeconds(32),
-      deltaT: () => {
-        throw new Error("deltaT table is unavailable.");
+    for (const providerError of [
+      new Error("deltaT table is unavailable."),
+      new PrimitiveError("InvalidNumber", "deltaT must be finite.")
+    ]) {
+      const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
+        leapSeconds: fixedLeapSeconds(32),
+        deltaT: () => {
+          throw providerError;
+        }
+      });
+      let capturedError: unknown;
+
+      try {
+        instant.toUT1();
+      } catch (error) {
+        capturedError = error;
       }
-    });
-    let capturedError: unknown;
 
-    try {
-      instant.toUT1();
-    } catch (error) {
-      capturedError = error;
-    }
+      expect(capturedError).toBeInstanceOf(TemporalError);
+      expect(capturedError).not.toBeInstanceOf(PrimitiveError);
 
-    expect(capturedError).toBeInstanceOf(TemporalError);
-
-    if (capturedError instanceof TemporalError) {
-      expect(capturedError.code).toBe("InvalidTimeScaleInput");
+      if (capturedError instanceof TemporalError) {
+        expect(capturedError.code).toBe("InvalidTimeScaleInput");
+      }
     }
   });
 });
