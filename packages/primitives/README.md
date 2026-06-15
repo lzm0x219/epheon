@@ -187,8 +187,8 @@ class PrimitiveError extends Error {
 
 第一阶段当前公共入口只导出 `Angle`、`Duration`、`Result`、`Tolerance` 与结构化错误。
 
-RFC 0004 中的 `Interval` 与 `Maybe` 仍是可选能力，暂未从 `@epheon/primitives`
-导出。是否进入第一阶段由后续计划任务 1.3 决策；若进入，需要先补充 API、错误模型与测试要求。
+RFC 0004 中的 `Interval` 与 `Maybe` 第一阶段暂缓，暂未从 `@epheon/primitives`
+导出。当前优先使用 `Result<T, E>` 表达可恢复错误；若未来推进，需要先补充 API、错误模型与测试要求。
 
 ## 许可
 

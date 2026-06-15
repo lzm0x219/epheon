@@ -23,7 +23,7 @@ pnpm + Moonrepo + tsdown + Vitest + Oxlint + Oxfmt + Changesets
 当前验证结果：
 
 ```txt
-CI=true pnpm test       通过，8 个测试文件、42 个测试
+CI=true pnpm test       通过，8 个测试文件、47 个测试
 CI=true pnpm typecheck  通过
 CI=true pnpm build      通过
 ```
@@ -169,6 +169,11 @@ CI=true pnpm test
 
 依赖：无。
 
+当前状态：
+
+- `standards/primitives/angles.json` 已扩充零值、负值、多圈、半度和归一化端点样例。
+- `standards/primitives/durations.json` 已扩充零值、毫秒、小数秒、负固定日和小数日样例。
+
 ### 任务 1.2：用 fixture 驱动 primitives 测试
 
 说明：Angle 和 Duration 的稳定数值样例应优先来自 `standards/`，避免同类数值散落
@@ -188,6 +193,12 @@ CI=true pnpm test
 
 依赖：任务 1.1。
 
+当前状态：
+
+- Angle 与 Duration 换算测试继续从 `standards/primitives/` 读取。
+- 已补测 `normalizeRadians()`、`normalizeTurns()`、公共算术边界和稳定错误码。
+- Result 类型守卫与 Tolerance absolute/relative 错误边界已补测。
+
 ### 任务 1.3：决策 Interval 与 Maybe 是否进入第一阶段
 
 说明：RFC 0004 将 Interval 与 Maybe 标记为可选能力。需要先决策，再决定是否实现。
@@ -205,6 +216,12 @@ CI=true pnpm typecheck
 ```
 
 依赖：任务 0.3。
+
+当前状态：
+
+- 第一阶段暂缓 `Interval` 与 `Maybe`，公共入口不导出。
+- 当前优先使用 `Result<T, E>` 表达可恢复错误。
+- 若未来推进，需要先更新 RFC 0004 的 API、错误模型和测试要求。
 
 ## 五、阶段 2：巩固 `@epheon/temporal`
 
@@ -228,6 +245,12 @@ CI=true pnpm test
 
 依赖：无。
 
+当前状态：
+
+- `standards/temporal/julian-days.json` 已扩充闰年日期、小数秒、正负 offset 等价时刻样例。
+- `standards/temporal/time-scales.json` 已扩充不同 TAI-UTC 与小数 Delta-T 样例。
+- 已新增 `standards/temporal/utc-invalid-inputs.json`，记录缺少 offset、缺少秒、非法日期、非法 offset 与闰秒字段样例。
+
 ### 任务 2.2：补齐 UTC 输入边界测试
 
 说明：UTC 是 temporal 的公共输入边界，需要对显式 offset 和拒绝隐式本地时间保持
@@ -246,6 +269,15 @@ CI=true pnpm test
 ```
 
 依赖：任务 2.1。
+
+当前状态：
+
+- `Instant.parseUTC()` 与 `Instant.fromUTC()` 已读取 `standards/temporal/utc-invalid-inputs.json`
+  校验同一批非法输入。
+- 已覆盖 `UtcDateTime.toFields()` 和 `Instant.toUTCFields()` 的调用方不可变视角。
+- `UtcDateTime.fromFields()` 已覆盖非法 Gregorian 日期、非有限数、非整数离散字段、
+  负 clock 字段和第一阶段闰秒拒绝。
+- 仍需补齐月份、日期、offset 上限和极端合法 offset 等边界。
 
 ### 任务 2.3：明确 JulianDay 直接构造 API
 
@@ -268,6 +300,13 @@ CI=true pnpm test
 
 依赖：任务 0.3。
 
+当前状态：
+
+- 第一阶段继续暂缓 `JulianDay.fromGregorian(...)` 或同类公共 API。
+- `packages/temporal/README.md` 已把该能力列入当前限制。
+- RFC 0003 仍将直接 Gregorian/JD 公共互转留到后续 API 收敛时再决策。
+- `src/internal/gregorian` 未从主入口导出。
+
 ### 任务 2.4：加固 provider 错误边界
 
 说明：闰秒和 Delta-T provider 是外部注入边界，必须稳定收敛错误，避免泄漏内部或
@@ -286,6 +325,13 @@ CI=true pnpm test
 ```
 
 依赖：任务 0.3。
+
+当前状态：
+
+- leap second provider 返回 `NaN` 或抛错时已收敛为 `TemporalError`。
+- Delta-T provider 抛出普通 `Error` 时已收敛为 `TemporalError`。
+- 仍需补齐 leap second provider 正负 `Infinity` 和 Delta-T provider 抛出
+  `PrimitiveError` 的测试。
 
 ## 六、阶段 3：建立验证体系骨架
 
@@ -307,6 +353,10 @@ CI=true pnpm typecheck
 
 依赖：任务 1.2、任务 2.2。
 
+当前状态：
+
+- `conformance/` 目前只有 `.gitkeep`，尚未补 README。
+
 ### 任务 3.2：创建 `benchmarks/` 最小骨架
 
 说明：benchmark 先用于记录基线，不作为性能优化入口。
@@ -325,6 +375,10 @@ CI=true pnpm typecheck
 
 依赖：任务 1.2、任务 2.2。
 
+当前状态：
+
+- `benchmarks/` 目前只有 `.gitkeep`，尚未补 README。
+
 ### 任务 3.3：建立标准数据维护规范
 
 说明：标准样例需要记录来源、字段含义和 tolerance，才能支撑未来跨实现校验。
@@ -342,6 +396,10 @@ CI=true pnpm format:check
 ```
 
 依赖：任务 1.1、任务 2.1。
+
+当前状态：
+
+- `standards/README.md` 尚未创建。
 
 ## 七、阶段 4：进入第二阶段前的 RFC
 
@@ -418,10 +476,10 @@ CI=true pnpm format:check
 
 ## 九、推荐下一步
 
-当前阶段 0 已收口。下一步优先执行：
+当前阶段 0、阶段 1 和任务 2.1 已收口。下一步优先执行：
 
 ```txt
-任务 1.1：扩充 primitives 标准样例
+任务 2.2：补齐 UTC 输入边界测试中剩余的 fromFields 与 offset 边界
 ```
 
-任务 1.1 完成后，再执行任务 1.2，用 standards fixture 驱动 primitives 测试。
+任务 2.2 完成后，再执行任务 2.4，补齐 provider 的剩余错误收敛测试。

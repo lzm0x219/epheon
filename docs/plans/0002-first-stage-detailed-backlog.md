@@ -9,8 +9,8 @@
 
 ```txt
 阶段 0 工程骨架已收口。
-primitives 的 fixture 驱动测试已基本落地。
-temporal 的核心能力已可运行，但标准样例、非法输入样例和 provider 边界仍需扩展。
+primitives 的 fixture、边界测试和 Interval/Maybe 暂缓决策已收口。
+temporal 的标准样例和非法输入样例已扩展，UTC 与 provider 边界仍需补剩余测试。
 conformance 与 benchmarks 目前只有占位目录，需要先补文档边界，再决定是否加入可执行任务。
 ```
 
@@ -48,6 +48,7 @@ standards/primitives/angles.json
 standards/primitives/durations.json
 standards/temporal/julian-days.json
 standards/temporal/time-scales.json
+standards/temporal/utc-invalid-inputs.json
 ```
 
 当前已明确暂缓：
@@ -64,26 +65,25 @@ TDB
 
 ## 三、任务状态总览
 
-| 任务 | 状态   | 说明                                                                |
-| ---- | ------ | ------------------------------------------------------------------- |
-| D0.1 | 已完成 | 非交互命令与 CI 约定已记录。                                        |
-| D0.2 | 已完成 | GitHub CI workflow 已存在。                                         |
-| D0.3 | 已完成 | README、RFC 与错误码已对齐到当前 API。                              |
-| D1.1 | 待复核 | primitives fixture 已使用，但样例覆盖还可扩展。                     |
-| D1.2 | 待复核 | primitives 测试已从 standards 读取，仍需补归一化与算术边界。        |
-| D1.3 | 待决策 | Interval 与 Maybe 是否进入第一阶段尚未最终关闭。                    |
-| D2.1 | 待执行 | temporal standards 需要扩展更多日期、offset、小数秒与时间尺度样例。 |
-| D2.2 | 待执行 | UTC 输入边界测试需要从内联样例升级为更系统的覆盖。                  |
-| D2.3 | 待决策 | JulianDay 直接 Gregorian 构造 API 当前仍暂缓。                      |
-| D2.4 | 待执行 | provider 非法值与错误收敛还可更完整。                               |
-| D3.x | 待执行 | conformance、benchmarks、standards README 仍需骨架说明。            |
+| 任务 | 状态   | 说明                                                                      |
+| ---- | ------ | ------------------------------------------------------------------------- |
+| D0.1 | 已完成 | 非交互命令与 CI 约定已记录。                                              |
+| D0.2 | 已完成 | GitHub CI workflow 已存在。                                               |
+| D0.3 | 已完成 | README、RFC 与错误码已对齐到当前 API。                                    |
+| D1.1 | 已完成 | primitives fixture 已扩充角度与时长边界样例。                             |
+| D1.2 | 已完成 | primitives 测试已覆盖 fixture、归一化、算术边界和错误码。                 |
+| D1.3 | 已完成 | Interval 与 Maybe 第一阶段暂缓，当前不从公共入口导出。                    |
+| D2.1 | 已完成 | temporal standards 已扩展日期、offset、小数秒、时间尺度与非法输入样例。   |
+| D2.2 | 进行中 | 非法输入 fixture 已接入 parseUTC/fromUTC，fromFields 与 offset 边界待补。 |
+| D2.3 | 已暂缓 | JulianDay 直接 Gregorian 构造 API 第一阶段不进入公共入口。                |
+| D2.4 | 进行中 | provider 抛错和 NaN 已覆盖，Infinity 与 PrimitiveError 路径待补。         |
+| D3.x | 待执行 | conformance、benchmarks、standards README 仍需骨架说明。                  |
 
 ## 四、阶段 1：`@epheon/primitives` 细化任务
 
 ### D1.1.1：扩充 Angle 换算标准样例
 
-说明：当前 `angles.json` 已覆盖 180 度与 1 度。应增加零值、负值、多圈、角分和角秒
-精度边界。
+说明：`angles.json` 已扩充零值、负值、多圈、角分和角秒精度边界。
 
 验收标准：
 
@@ -112,7 +112,7 @@ packages/primitives/tests/angle.test.ts
 
 ### D1.1.2：扩充 Angle 归一化标准样例
 
-说明：当前归一化样例覆盖 `370`、`-10`、`190`。还应覆盖周期边界与半开区间端点。
+说明：Angle 归一化样例已覆盖周期边界与半开区间端点。
 
 验收标准：
 
@@ -139,8 +139,7 @@ packages/primitives/tests/angle.test.ts
 
 ### D1.1.3：补测 Angle 的 radians 与 turns 归一化
 
-说明：当前测试主要验证 degree 归一化。公共 API 还包含 `normalizeRadians()` 和
-`normalizeTurns()`，需要显式测试。
+说明：公共 API 的 `normalizeRadians()` 和 `normalizeTurns()` 已有显式测试。
 
 验收标准：
 
@@ -167,7 +166,7 @@ packages/primitives/tests/helpers.ts
 
 ### D1.2.1：扩充 Duration 标准样例
 
-说明：当前 `durations.json` 覆盖 1 日和 1 儒略年。应增加零值、负值、毫秒和小数日。
+说明：`durations.json` 已扩充零值、负值、毫秒和小数日。
 
 验收标准：
 
@@ -196,7 +195,7 @@ packages/primitives/tests/duration.test.ts
 
 ### D1.2.2：补测 Angle 与 Duration 算术边界
 
-说明：当前测试验证了不可变性和少量算术路径。应补全公共算术方法的边界行为。
+说明：公共算术方法的主要边界行为已补测。
 
 验收标准：
 
@@ -250,7 +249,7 @@ packages/primitives/tests/tolerance.test.ts
 
 ### D1.3.1：关闭或推进 Interval 决策
 
-说明：RFC 0004 将 Interval 标为第一阶段可选。当前公共入口未导出，需要明确是否暂缓。
+说明：RFC 0004 将 Interval 标为第一阶段可选；当前已明确暂缓，公共入口不导出。
 
 验收标准：
 
@@ -278,8 +277,7 @@ packages/primitives/README.md
 
 ### D1.3.2：关闭或推进 Maybe 决策
 
-说明：RFC 0004 提到 Maybe 可暂缓，且当前错误模型更依赖 `Result`。需要单独关闭决策，
-避免后续反复讨论。
+说明：RFC 0004 提到 Maybe 可暂缓；当前已明确第一阶段优先使用 `Result`。
 
 验收标准：
 
@@ -322,8 +320,7 @@ CI=true pnpm build
 
 ### D2.1.1：扩充 Julian Day 标准样例
 
-说明：当前 `julian-days.json` 只有三个样例。需要覆盖更多 Gregorian 日期、offset 和
-小数秒输入。
+说明：`julian-days.json` 已扩充 Gregorian 日期、offset 和小数秒输入。
 
 验收标准：
 
@@ -352,8 +349,8 @@ packages/temporal/tests/instant.test.ts
 
 ### D2.1.2：扩充时间尺度标准样例
 
-说明：`time-scales.json` 已覆盖 J2000 附近样例。需要补不同 TAI-UTC 与 Delta-T 值的
-样例，避免实现只对单一数字组合正确。
+说明：`time-scales.json` 已补充不同 TAI-UTC 与 Delta-T 值的样例，避免实现只对单一
+数字组合正确。
 
 验收标准：
 
@@ -383,7 +380,7 @@ packages/temporal/tests/time-scale.test.ts
 
 ### D2.1.3：为非法 UTC 输入建立样例清单
 
-说明：非法输入目前主要写在测试中。可以先建立标准化清单，再决定是否由测试读取。
+说明：非法输入已建立标准化清单，并由 `Instant` 测试读取。
 
 验收标准：
 
@@ -494,8 +491,8 @@ packages/temporal/tests/instant.test.ts
 
 ### D2.3.1：关闭 JulianDay.fromGregorian 决策
 
-说明：RFC 0003 当前将 Gregorian 与 JD 的公共互转 API 留到后续收敛。需要把这个决策在
-计划中关闭或推进。
+说明：RFC 0003 当前将 Gregorian 与 JD 的公共互转 API 留到后续收敛；计划中已按暂缓
+关闭。
 
 验收标准：
 
@@ -899,34 +896,15 @@ docs/rfcs/0007-phenomena-events.md
 短期最小路径：
 
 ```txt
-1. D1.1.1
-2. D1.1.2
-3. D1.1.3
-4. D1.2.1
-5. D1.2.2
-6. D1.2.3
-7. D1.3.1
-8. D1.3.2
-9. Checkpoint P
+1. D2.2.2
+2. D2.2.3
+3. D2.4.1
+4. D2.4.2
+5. D2.4.3
+6. Checkpoint T
 ```
 
-随后进入 temporal：
-
-```txt
-1. D2.1.1
-2. D2.1.2
-3. D2.1.3
-4. D2.2.1
-5. D2.2.2
-6. D2.2.3
-7. D2.3.1
-8. D2.4.1
-9. D2.4.2
-10. D2.4.3
-11. Checkpoint T
-```
-
-最后补验证体系：
+随后补验证体系：
 
 ```txt
 1. D3.1.1
@@ -944,25 +922,20 @@ docs/rfcs/0007-phenomena-events.md
 可以并行：
 
 ```txt
-D1.1.1 与 D1.2.1
-D2.1.1 与 D2.2.2
+D2.2.2 与 D2.4.1
 D3.1.2 与 D3.2.1
 ```
 
 需要串行：
 
 ```txt
-D1.1.1 -> D1.1.2 -> D1.1.3
-D2.1.3 -> D2.2.1
+D2.4.1 -> D2.4.2
 D4.1.2 -> D4.2.1 -> D4.3.1
 ```
 
 需要人工决策：
 
 ```txt
-D1.3.1 Interval 是否进入第一阶段
-D1.3.2 Maybe 是否进入第一阶段
-D2.3.1 JulianDay.fromGregorian(...) 是否进入第一阶段公共 API
 D3.1.3 conformance 是否成为可执行 workspace
 D3.2.2 benchmark 是否引入新工具链
 ```

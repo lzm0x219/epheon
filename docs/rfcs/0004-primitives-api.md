@@ -178,7 +178,7 @@ duration.toJulianCenturies(): number
 
 `Interval` 表示一维数值区间。
 
-第一阶段可选实现。若实现，应保持通用：
+第一阶段暂缓实现。若未来实现，应保持通用：
 
 ```ts
 Interval.closed(min, max);
@@ -271,7 +271,7 @@ fromXxx -> throw on invalid input
 
 ## 九、Maybe
 
-`Maybe` 第一阶段可以暂缓。
+`Maybe` 第一阶段暂缓，当前优先使用 `Result<T, E>` 表达可恢复错误。
 
 如果需要，建议定义为：
 

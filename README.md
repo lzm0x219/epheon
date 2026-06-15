@@ -134,7 +134,7 @@ explicit precision and tolerance rules
 @epheon/temporal: Instant, JulianDay, JulianEphemerisDay, UtcDateTime, provider 类型与固定 provider helper, TemporalError
 ```
 
-`@epheon/primitives` 暂未导出 Interval 或 Maybe。`@epheon/temporal` 暂未导出
+`@epheon/primitives` 第一阶段暂缓 Interval 与 Maybe，当前不导出。`@epheon/temporal` 暂未导出
 Gregorian 辅助函数、UTC 字符串解析器、时间常量或其他 `src/internal/` 实现细节。
 
 第一阶段有意排除：
