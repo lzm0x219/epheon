@@ -139,20 +139,26 @@ describe("Instant", () => {
   });
 
   it("wraps invalid leap second provider results as TemporalError", () => {
-    let capturedError: unknown;
+    for (const taiMinusUtcSeconds of [
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY
+    ]) {
+      let capturedError: unknown;
 
-    try {
-      Instant.fromUTC("2000-01-01T12:00:00Z", {
-        leapSeconds: () => Number.NaN
-      });
-    } catch (error) {
-      capturedError = error;
-    }
+      try {
+        Instant.fromUTC("2000-01-01T12:00:00Z", {
+          leapSeconds: () => taiMinusUtcSeconds
+        });
+      } catch (error) {
+        capturedError = error;
+      }
 
-    expect(capturedError).toBeInstanceOf(TemporalError);
+      expect(capturedError).toBeInstanceOf(TemporalError);
 
-    if (capturedError instanceof TemporalError) {
-      expect(capturedError.code).toBe("InvalidTimeScaleInput");
+      if (capturedError instanceof TemporalError) {
+        expect(capturedError.code).toBe("InvalidTimeScaleInput");
+      }
     }
   });
 
