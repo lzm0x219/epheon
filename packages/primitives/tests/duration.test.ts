@@ -1,22 +1,29 @@
 import { describe, expect, it } from "vitest";
 import durationStandards from "../../../standards/primitives/durations.json";
 import { Duration, PrimitiveError } from "../src";
+import { expectAlmostEqual } from "./helpers";
 
 const TOLERANCE = { absolute: 1e-12 };
 
 describe("Duration", () => {
   it("converts fixed time units from standards", () => {
     for (const standard of durationStandards.conversions) {
-      expect(Duration.fromSeconds(standard.seconds).toDays()).toBeCloseTo(standard.days);
-      expect(Duration.fromMilliseconds(standard.milliseconds).toSeconds()).toBeCloseTo(
-        standard.seconds
+      expectAlmostEqual(Duration.fromSeconds(standard.seconds).toDays(), standard.days, TOLERANCE);
+      expectAlmostEqual(
+        Duration.fromMilliseconds(standard.milliseconds).toSeconds(),
+        standard.seconds,
+        TOLERANCE
       );
-      expect(Duration.fromDays(standard.days).toSeconds()).toBeCloseTo(standard.seconds);
-      expect(Duration.fromJulianYears(standard.julianYears).toSeconds()).toBeCloseTo(
-        standard.seconds
+      expectAlmostEqual(Duration.fromDays(standard.days).toSeconds(), standard.seconds, TOLERANCE);
+      expectAlmostEqual(
+        Duration.fromJulianYears(standard.julianYears).toSeconds(),
+        standard.seconds,
+        TOLERANCE
       );
-      expect(Duration.fromJulianCenturies(standard.julianCenturies).toSeconds()).toBeCloseTo(
-        standard.seconds
+      expectAlmostEqual(
+        Duration.fromJulianCenturies(standard.julianCenturies).toSeconds(),
+        standard.seconds,
+        TOLERANCE
       );
     }
   });
