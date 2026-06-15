@@ -2,6 +2,7 @@ import { Duration } from "@epheon/primitives";
 import { describe, expect, it } from "vitest";
 import julianDayStandards from "../../../standards/temporal/julian-days.json";
 import timeScaleStandards from "../../../standards/temporal/time-scales.json";
+import invalidUtcStandards from "../../../standards/temporal/utc-invalid-inputs.json";
 import { fixedDeltaT, fixedLeapSeconds, Instant, TemporalError, UtcDateTime } from "../src";
 import { expectAlmostEqual } from "./helpers";
 
@@ -38,29 +39,28 @@ describe("Instant", () => {
     );
   });
 
-  it("rejects implicit local time", () => {
-    expect(() => Instant.fromUTC("2000-01-01T12:00:00")).toThrow(TemporalError);
+  it("rejects invalid UTC inputs from standards", () => {
+    for (const standard of invalidUtcStandards.utcDateTimes) {
+      const result = Instant.parseUTC(standard.input);
+
+      expect(result.ok).toBe(false);
+
+      if (!result.ok) {
+        expect(result.error.code).toBe(standard.code);
+      }
+
+      expect(() => Instant.fromUTC(standard.input)).toThrow(TemporalError);
+    }
   });
 
-  it("rejects invalid Gregorian calendar dates", () => {
-    expect(() => Instant.fromUTC("2026-02-29T00:00:00Z")).toThrow(TemporalError);
+  it("accepts Gregorian leap-year dates", () => {
     expect(() => Instant.fromUTC("2024-02-29T00:00:00Z")).not.toThrow();
-  });
-
-  it("rejects leap second fields until leap second day semantics are implemented", () => {
-    expect(() => Instant.fromUTC("2016-12-31T23:59:60Z")).toThrow(TemporalError);
   });
 
   it("returns Result from parseUTC", () => {
     const success = Instant.parseUTC("2000-01-01T12:00:00Z");
-    const failure = Instant.parseUTC("2000-01-01T12:00:00");
 
     expect(success.ok).toBe(true);
-    expect(failure.ok).toBe(false);
-
-    if (!failure.ok) {
-      expect(failure.error.code).toBe("InvalidUTCDateTime");
-    }
   });
 
   it("returns a public UTC date-time value object", () => {

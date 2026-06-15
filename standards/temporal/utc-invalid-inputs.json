@@ -1,0 +1,29 @@
+{
+  "utcDateTimes": [
+    {
+      "input": "2000-01-01T12:00:00",
+      "code": "InvalidUTCDateTime",
+      "basis": "Missing explicit UTC offset."
+    },
+    {
+      "input": "2000-01-01T12:00Z",
+      "code": "InvalidUTCDateTime",
+      "basis": "Missing seconds field."
+    },
+    {
+      "input": "2026-02-29T00:00:00Z",
+      "code": "InvalidUTCDateTime",
+      "basis": "Invalid Gregorian date in a non-leap year."
+    },
+    {
+      "input": "2000-01-01T12:00:00+24:00",
+      "code": "InvalidUTCDateTime",
+      "basis": "UTC offset hour is out of range."
+    },
+    {
+      "input": "2016-12-31T23:59:60Z",
+      "code": "InvalidUTCDateTime",
+      "basis": "Leap second field is deferred in the first-stage UTC boundary."
+    }
+  ]
+}

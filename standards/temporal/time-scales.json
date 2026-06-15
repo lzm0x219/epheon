@@ -26,6 +26,16 @@
       "ttMinusUtcSeconds": 64.184,
       "ut1MinusUtcSeconds": 0.354,
       "julianEphemerisDay": 2451179.5007428704
+    },
+    {
+      "input": "2017-01-01T00:00:00Z",
+      "julianDay": 2457754.5,
+      "taiMinusUtcSeconds": 37,
+      "deltaTSeconds": 68.592,
+      "ttMinusUtcSeconds": 69.184,
+      "ut1MinusUtcSeconds": 0.5919999999999987,
+      "julianEphemerisDay": 2457754.500800741,
+      "basis": "TT-UTC = TAI-UTC + 32.184s; UT1-UTC = TT-UTC - Delta-T; JDE = JD + (TT-UTC)/86400."
     }
   ]
 }
