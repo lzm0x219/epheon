@@ -1,6 +1,6 @@
 # @epheon/primitives
 
-Epheon 最底层的基础值类型包。提供角度、时长、误差容忍度、Result 错误模型等通用数学原语，是下游所有包的共同语言。
+Epheon 最底层的基础值类型包。提供角度、时长、三维向量、误差容忍度、Result 错误模型等通用数学原语，是下游所有包的共同语言。
 
 ## 设计原则
 
@@ -32,7 +32,8 @@ import {
   isOk,
   isErr,
   type Tolerance,
-  almostEqual
+  almostEqual,
+  Vector3
 } from "@epheon/primitives";
 ```
 
@@ -166,6 +167,24 @@ if (isOk(result)) {
 }
 ```
 
+## Vector3（三维向量）
+
+`Vector3` 表示不可变三维向量。它只表达数学向量，不携带参考系、原点或天体语义。
+这些语义属于未来的 `@epheon/reference`。
+
+```ts
+const a = Vector3.fromXYZ(1, 0, 0);
+const b = Vector3.fromXYZ(0, 1, 0);
+
+a.add(b).toArray(); // [1, 1, 0]
+a.dot(b); // 0
+a.cross(b).toArray(); // [0, 0, 1]
+a.magnitude(); // 1
+```
+
+`Vector3.normalize()` 会拒绝零向量并抛出 `PrimitiveError`，错误码为
+`DivisionByZero`。
+
 ## PrimitiveError（结构化错误）
 
 ```ts
@@ -185,7 +204,8 @@ class PrimitiveError extends Error {
 
 ## 当前限制
 
-第一阶段当前公共入口只导出 `Angle`、`Duration`、`Result`、`Tolerance` 与结构化错误。
+第一阶段当前公共入口只导出 `Angle`、`Duration`、`Vector3`、`Result`、`Tolerance`
+与结构化错误。
 
 RFC 0004 中的 `Interval` 与 `Maybe` 第一阶段暂缓，暂未从 `@epheon/primitives`
 导出。当前优先使用 `Result<T, E>` 表达可恢复错误；若未来推进，需要先补充 API、错误模型与测试要求。
