@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import julianDayStandards from "../../../standards/temporal/julian-days.json";
 import timeScaleStandards from "../../../standards/temporal/time-scales.json";
 import { fixedDeltaT, fixedLeapSeconds, Instant, TemporalError, UtcDateTime } from "../src";
+import { expectAlmostEqual } from "./helpers";
+
+const DAY_TOLERANCE = { absolute: 1e-9 };
+const SECOND_TOLERANCE = { absolute: 1e-12 };
 
 function firstTimeScaleStandard(): (typeof timeScaleStandards.timeScaleConversions)[number] {
   const standard = timeScaleStandards.timeScaleConversions[0];
@@ -19,7 +23,7 @@ describe("Instant", () => {
     for (const standard of julianDayStandards.utcInstants) {
       const instant = Instant.fromUTC(standard.input);
 
-      expect(instant.toJulianDay().toNumber()).toBeCloseTo(standard.julianDay);
+      expectAlmostEqual(instant.toJulianDay().toNumber(), standard.julianDay, DAY_TOLERANCE);
     }
   });
 
@@ -27,7 +31,11 @@ describe("Instant", () => {
     const z = Instant.fromUTC("2000-01-01T12:00:00Z");
     const plusEight = Instant.fromUTC("2000-01-01T20:00:00+08:00");
 
-    expect(plusEight.toJulianDay().toNumber()).toBeCloseTo(z.toJulianDay().toNumber());
+    expectAlmostEqual(
+      plusEight.toJulianDay().toNumber(),
+      z.toJulianDay().toNumber(),
+      DAY_TOLERANCE
+    );
   });
 
   it("rejects implicit local time", () => {
@@ -37,6 +45,10 @@ describe("Instant", () => {
   it("rejects invalid Gregorian calendar dates", () => {
     expect(() => Instant.fromUTC("2026-02-29T00:00:00Z")).toThrow(TemporalError);
     expect(() => Instant.fromUTC("2024-02-29T00:00:00Z")).not.toThrow();
+  });
+
+  it("rejects leap second fields until leap second day semantics are implemented", () => {
+    expect(() => Instant.fromUTC("2016-12-31T23:59:60Z")).toThrow(TemporalError);
   });
 
   it("returns Result from parseUTC", () => {
@@ -89,7 +101,29 @@ describe("Instant", () => {
 
     expect(providerInput).toBeInstanceOf(UtcDateTime);
     expect(providerInput?.toFields()).toEqual(instant.toUTCFields());
-    expect(instant.toJulianEphemerisDay().toNumber()).toBeCloseTo(standard.julianEphemerisDay);
+    expectAlmostEqual(
+      instant.toJulianEphemerisDay().toNumber(),
+      standard.julianEphemerisDay,
+      DAY_TOLERANCE
+    );
+  });
+
+  it("requires a leap second provider before computing TT or JDE", () => {
+    const instant = Instant.fromUTC("2000-01-01T12:00:00Z");
+
+    for (const compute of [() => instant.toTT(), () => instant.toJulianEphemerisDay()]) {
+      expect(compute).toThrow(TemporalError);
+
+      try {
+        compute();
+      } catch (error) {
+        expect(error).toBeInstanceOf(TemporalError);
+
+        if (error instanceof TemporalError) {
+          expect(error.code).toBe("MissingLeapSecondProvider");
+        }
+      }
+    }
   });
 
   it("wraps invalid leap second provider results as TemporalError", () => {
@@ -136,8 +170,12 @@ describe("Instant", () => {
         leapSeconds: fixedLeapSeconds(standard.taiMinusUtcSeconds)
       });
 
-      expect(instant.toJulianDay().toNumber()).toBeCloseTo(standard.julianDay);
-      expect(instant.toJulianEphemerisDay().toNumber()).toBeCloseTo(standard.julianEphemerisDay);
+      expectAlmostEqual(instant.toJulianDay().toNumber(), standard.julianDay, DAY_TOLERANCE);
+      expectAlmostEqual(
+        instant.toJulianEphemerisDay().toNumber(),
+        standard.julianEphemerisDay,
+        DAY_TOLERANCE
+      );
     }
   });
 
@@ -152,14 +190,20 @@ describe("Instant", () => {
       const ut1 = instant.toUT1();
 
       expect(tt.scale).toBe("TT");
-      expect(tt.offsetFromUtc.toSeconds()).toBeCloseTo(standard.ttMinusUtcSeconds);
+      expectAlmostEqual(tt.offsetFromUtc.toSeconds(), standard.ttMinusUtcSeconds, SECOND_TOLERANCE);
       expect(ut1.scale).toBe("UT1");
-      expect(ut1.offsetFromUtc.toSeconds()).toBeCloseTo(standard.ut1MinusUtcSeconds);
+      expectAlmostEqual(
+        ut1.offsetFromUtc.toSeconds(),
+        standard.ut1MinusUtcSeconds,
+        SECOND_TOLERANCE
+      );
     }
   });
 
   it("requires Delta-T provider before computing UT1", () => {
-    const instant = Instant.fromUTC("2000-01-01T12:00:00Z");
+    const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
+      leapSeconds: fixedLeapSeconds(32)
+    });
 
     expect(() => instant.toUT1()).toThrow(TemporalError);
 
@@ -176,6 +220,7 @@ describe("Instant", () => {
 
   it("wraps Delta-T provider failures as TemporalError", () => {
     const instant = Instant.fromUTC("2000-01-01T12:00:00Z", {
+      leapSeconds: fixedLeapSeconds(32),
       deltaT: () => {
         throw new Error("deltaT table is unavailable.");
       }

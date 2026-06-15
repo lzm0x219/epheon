@@ -3,6 +3,7 @@ export type TemporalErrorCode =
   | "InvalidJulianDay"
   | "InvalidTimeScaleInput"
   | "InvalidUTCDateTime"
+  | "MissingLeapSecondProvider"
   | "MissingDeltaTProvider";
 
 /**

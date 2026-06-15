@@ -1,15 +1,20 @@
 import { Duration, err, ok, type Result } from "@epheon/primitives";
 import type { DeltaTProvider, LeapSecondProvider } from "./providers";
 import { TemporalError, toTemporalError } from "./errors";
-import { MINUTES_PER_DAY, SECONDS_PER_DAY, TT_MINUS_TAI_SECONDS } from "./internal/constants";
+import { MINUTES_PER_DAY } from "./internal/constants";
 import { gregorianToJulianDay } from "./internal/gregorian";
 import { assertFiniteNumber } from "./internal/number";
+import {
+  taiMinusUtcToTTMinusUtc,
+  ttMinusUtcToUT1MinusUtc,
+  utcJulianDayToJulianEphemerisDay
+} from "./internal/time-scale";
 import { parseUTCDateTime } from "./internal/utc-parser";
 import { JulianDay, JulianEphemerisDay } from "./julian-day";
 import { UtcDateTime, type UtcDateTimeFields } from "./utc-date-time";
 
 export type InstantOptions = {
-  /** UTC 到 TAI 转换所需的闰秒 provider；未提供时第一阶段按 0 处理。 */
+  /** UTC 到 TAI 转换所需的闰秒 provider；请求 TT/JDE/UT1 时必须显式提供。 */
   readonly leapSeconds?: LeapSecondProvider;
   /** TT 到 UT1 转换所需的 Delta-T provider；只在请求 UT1 表达时使用。 */
   readonly deltaT?: DeltaTProvider;
@@ -31,18 +36,18 @@ export type TimePoint = {
 export class Instant {
   readonly #utcJulianDay: JulianDay;
   readonly #utcDateTime: UtcDateTime;
-  readonly #leapSeconds: number;
+  readonly #taiMinusUtcSeconds: number | undefined;
   readonly #deltaT: DeltaTProvider | undefined;
 
   private constructor(
     utcJulianDay: JulianDay,
     utcDateTime: UtcDateTime,
-    leapSeconds: number,
+    taiMinusUtcSeconds: number | undefined,
     deltaT: DeltaTProvider | undefined
   ) {
     this.#utcJulianDay = utcJulianDay;
     this.#utcDateTime = utcDateTime;
-    this.#leapSeconds = leapSeconds;
+    this.#taiMinusUtcSeconds = taiMinusUtcSeconds;
     this.#deltaT = deltaT;
   }
 
@@ -93,9 +98,9 @@ export class Instant {
     const utcJulianDay = JulianDay.fromNumber(
       localJulianDay - utcFields.offsetMinutes / MINUTES_PER_DAY
     );
-    const leapSeconds = readLeapSeconds(utcDateTime, options);
+    const taiMinusUtcSeconds = readOptionalLeapSeconds(utcDateTime, options);
 
-    return new Instant(utcJulianDay, utcDateTime, leapSeconds, options.deltaT);
+    return new Instant(utcJulianDay, utcDateTime, taiMinusUtcSeconds, options.deltaT);
   }
 
   /**
@@ -113,11 +118,7 @@ export class Instant {
    * @returns 当前 Instant 对应的 Julian Ephemeris Day。
    */
   toJulianEphemerisDay(): JulianEphemerisDay {
-    const ttOffsetSeconds = this.#leapSeconds + TT_MINUS_TAI_SECONDS;
-
-    return JulianEphemerisDay.fromNumber(
-      this.#utcJulianDay.toNumber() + ttOffsetSeconds / SECONDS_PER_DAY
-    );
+    return utcJulianDayToJulianEphemerisDay(this.#utcJulianDay, this.toTT().offsetFromUtc);
   }
 
   /**
@@ -128,7 +129,7 @@ export class Instant {
   toTT(): TimePoint {
     return {
       scale: "TT",
-      offsetFromUtc: Duration.fromSeconds(this.#leapSeconds + TT_MINUS_TAI_SECONDS)
+      offsetFromUtc: taiMinusUtcToTTMinusUtc(this.requireTaiMinusUtcSeconds())
     };
   }
 
@@ -151,7 +152,7 @@ export class Instant {
     try {
       return {
         scale: "UT1",
-        offsetFromUtc: this.toTT().offsetFromUtc.subtract(this.#deltaT(this))
+        offsetFromUtc: ttMinusUtcToUT1MinusUtc(this.toTT().offsetFromUtc, this.#deltaT(this))
       };
     } catch (error) {
       throw toTemporalError(error, "InvalidTimeScaleInput");
@@ -175,6 +176,23 @@ export class Instant {
   toUTCFields(): UtcDateTimeFields {
     return this.#utcDateTime.toFields();
   }
+
+  /**
+   * 返回已注入的 TAI-UTC 秒数。
+   *
+   * @returns TAI-UTC 秒数。
+   * @throws TemporalError 当构造 Instant 时未注入 leap second provider 时抛出。
+   */
+  private requireTaiMinusUtcSeconds(): number {
+    if (this.#taiMinusUtcSeconds === undefined) {
+      throw new TemporalError(
+        "MissingLeapSecondProvider",
+        "leapSeconds provider is required to compute TT, JDE, or UT1."
+      );
+    }
+
+    return this.#taiMinusUtcSeconds;
+  }
 }
 
 /**
@@ -185,12 +203,19 @@ export class Instant {
  *
  * @param utcDateTime provider 接收的 UTC 输入边界值对象。
  * @param options Instant 构造选项。
- * @returns 有限的 TAI - UTC 秒数。
+ * @returns 已提供 provider 时返回有限的 TAI-UTC 秒数，否则返回 undefined。
  * @throws TemporalError 当 provider 抛错或返回非有限数时抛出。
  */
-function readLeapSeconds(utcDateTime: UtcDateTime, options: InstantOptions): number {
+function readOptionalLeapSeconds(
+  utcDateTime: UtcDateTime,
+  options: InstantOptions
+): number | undefined {
+  if (options.leapSeconds === undefined) {
+    return undefined;
+  }
+
   try {
-    const leapSeconds = options.leapSeconds?.(utcDateTime) ?? 0;
+    const leapSeconds = options.leapSeconds(utcDateTime);
     assertFiniteNumber(leapSeconds, "leapSeconds", "InvalidTimeScaleInput");
     return leapSeconds;
   } catch (error) {

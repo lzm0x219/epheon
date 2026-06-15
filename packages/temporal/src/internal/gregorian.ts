@@ -61,7 +61,7 @@ export function assertGregorianDateTime(fields: UtcDateTimeFields): void {
     throw new TemporalError("InvalidUTCDateTime", "minute is out of range.");
   }
 
-  if (fields.second < 0 || fields.second >= 61) {
+  if (fields.second < 0 || fields.second >= 60) {
     throw new TemporalError("InvalidUTCDateTime", "second is out of range.");
   }
 }

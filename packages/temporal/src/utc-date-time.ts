@@ -18,7 +18,7 @@ export type UtcDateTimeFields = {
   readonly hour: number;
   /** 整数分钟，范围为 0-59。 */
   readonly minute: number;
-  /** 秒，范围为 [0, 61)，允许闰秒输入边界。 */
+  /** 秒，范围为 [0, 60)，第一阶段不接受闰秒输入边界。 */
   readonly second: number;
   /** 输入中声明的 UTC offset 整数分钟数，东区为正，西区为负。 */
   readonly offsetMinutes: number;

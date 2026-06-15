@@ -108,4 +108,18 @@ describe("UtcDateTime", () => {
       ).toThrow(TemporalError);
     }
   });
+
+  it("throws TemporalError for leap second values in the first-stage Gregorian path", () => {
+    expect(() =>
+      UtcDateTime.fromFields({
+        year: 2016,
+        month: 12,
+        day: 31,
+        hour: 23,
+        minute: 59,
+        second: 60,
+        offsetMinutes: 0
+      })
+    ).toThrow(TemporalError);
+  });
 });
