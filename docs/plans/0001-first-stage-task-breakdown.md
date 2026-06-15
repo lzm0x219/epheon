@@ -127,12 +127,7 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | A3 — benchmarks/README.md       | 已写入，说明第一阶段不引入 benchmark 工具链。                                        |
 | A4 — Vector3                    | 已实现：fromXYZ 构造、add/subtract/dot/cross、magnitude、normalize、equals。         |
 | A5 — Polynomial                 | 已实现：Horner 法 evaluatePolynomial，src/internal/，不导出。                        |
-
-### 第一阶段待执行
-
-| 任务            | 大小 | 说明                                |
-| --------------- | ---- | ----------------------------------- |
-| A6 — RootFinder | S    | primitives 新增二分法/Newton 法求根 |
+| A6 — RootFinder                 | 已实现：bisect 二分法，src/internal/，不导出。                                       |
 
 ### 第二阶段待执行
 
@@ -164,48 +159,7 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | A3 — benchmarks/README.md  | ✅   | 已写入，说明第一阶段不引入 benchmark 工具链。          |
 | A4 — Vector3               | ✅   | fromXYZ 构造、四则运算、叉积/点积、normalize、equals。 |
 | A5 — Polynomial            | ✅   | Horner 法 evaluatePolynomial，src/internal/，不导出。  |
-
----
-
-### A6：primitives 新增 RootFinder
-
-说明：节气求解本质是黄经函数上的根查找。第一阶段只实现二分法（bracketing），
-Newton 法留到性能优化阶段。同样放在 `src/internal/`。
-
-API 草案：
-
-```ts
-// packages/primitives/src/internal/root-finder.ts
-export function bisect(
-  f: (x: number) => number,
-  target: number,
-  left: number,
-  right: number,
-  options?: {
-    tolerance?: number; // 收敛容差，默认 1e-10
-    maxIterations?: number; // 最大迭代次数，默认 100
-  }
-): number;
-```
-
-验收标准：
-
-- 给定单调函数 f 和目标值 target，在 [left, right] 区间查找 x 使 `f(x) ≈ target`。
-- `f(left) - target` 与 `f(right) - target` 必须异号（bracket 条件），否则抛出
-  `PrimitiveError(DivisionByZero)`。
-- 收敛条件为区间宽度 < tolerance。
-- 超过 maxIterations 仍未收敛时抛出 Error。
-- 测试覆盖：线性函数、VSOP87 多项式风格的三角函数、空区间、无效 bracket。
-- 不导出到公共入口。
-
-可能触达文件：
-
-```txt
-packages/primitives/src/internal/root-finder.ts
-packages/primitives/tests/internal/root-finder.test.ts
-```
-
-任务大小：S。
+| A6 — RootFinder            | ✅   | bisect 二分法，src/internal/，不导出。                 |
 
 ---
 
