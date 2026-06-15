@@ -126,12 +126,12 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | A2 — conformance/README.md      | 已写入，说明 conformance 边界。                                                      |
 | A3 — benchmarks/README.md       | 已写入，说明第一阶段不引入 benchmark 工具链。                                        |
 | A4 — Vector3                    | 已实现：fromXYZ 构造、add/subtract/dot/cross、magnitude、normalize、equals。         |
+| A5 — Polynomial                 | 已实现：Horner 法 evaluatePolynomial，src/internal/，不导出。                        |
 
 ### 第一阶段待执行
 
 | 任务            | 大小 | 说明                                |
 | --------------- | ---- | ----------------------------------- |
-| A5 — Polynomial | S    | primitives 新增 Horner 法多项式求值 |
 | A6 — RootFinder | S    | primitives 新增二分法/Newton 法求根 |
 
 ### 第二阶段待执行
@@ -163,37 +163,7 @@ Checkpoint T 已在架构审查中通过（`lint`、`format:check`、`typecheck`
 | A2 — conformance/README.md | ✅   | 已写入，说明 conformance 边界。                        |
 | A3 — benchmarks/README.md  | ✅   | 已写入，说明第一阶段不引入 benchmark 工具链。          |
 | A4 — Vector3               | ✅   | fromXYZ 构造、四则运算、叉积/点积、normalize、equals。 |
-
----
-
-### A5：primitives 新增 Polynomial
-
-说明：多项式求值是纯算法的标准模式，用于 VSOP87 系数求值。第一阶段用 Horner 法简单实现，
-放在 `src/internal/`，太阳黄经计算前不暴露为公共 API。
-
-API 草案：
-
-```ts
-// packages/primitives/src/internal/polynomial.ts
-export function evaluatePolynomial(coefficients: readonly number[], x: number): number;
-```
-
-验收标准：
-
-- 接受系数数组（从低次到高次：`[c0, c1, c2, ...]`）。
-- Horner 法求值：`f(x) = c0 + c1*x + c2*x² + ...`。
-- 验证 `evaluatePolynomial([1, 2, 3], 5) === 86`（`3*25 + 2*5 + 1`）。
-- 测试覆盖零系数、单系数、负系数、空数组。
-- 不导出到公共入口。
-
-可能触达文件：
-
-```txt
-packages/primitives/src/internal/polynomial.ts
-packages/primitives/tests/internal/polynomial.test.ts
-```
-
-任务大小：S。
+| A5 — Polynomial            | ✅   | Horner 法 evaluatePolynomial，src/internal/，不导出。  |
 
 ---
 
