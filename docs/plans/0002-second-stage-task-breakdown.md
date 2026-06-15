@@ -49,12 +49,12 @@ CI=true pnpm build
 | 0005 | `docs/rfcs/0005-coordinate-reference-model.md` | 定义 reference 包的坐标、参考系、距离和天体枚举      |
 | 0006 | `docs/rfcs/0006-ephemeris-provider.md`         | 定义 ephemerides 包的 provider、precision 和错误模型 |
 
-仍需先写 RFC 的主题：
+第二阶段当前 RFC 状态：
 
-| RFC  | 主题                   | 阻塞任务 |
-| ---- | ---------------------- | -------- |
-| 0007 | 天象事件求解           | C5、C6   |
-| 0008 | Delta-T 与闰秒数据模型 | C3       |
+| RFC  | 主题                   | 状态   | 阻塞任务 |
+| ---- | ---------------------- | ------ | -------- |
+| 0007 | 天象事件求解           | 待开始 | C5、C6   |
+| 0008 | Delta-T 与闰秒数据模型 | 已完成 | C3       |
 
 ## 三、执行原则
 
@@ -71,20 +71,38 @@ const 对象替代 enum，与 isolatedModules 兼容。
 
 ## 四、任务总览
 
-| 任务 | 大小 | 前置条件                  | 输出                                                        |
-| ---- | ---- | ------------------------- | ----------------------------------------------------------- |
-| B3   | M    | C4、D1                    | RFC 0007 天象事件求解                                       |
-| B4   | M    | 无                        | RFC 0008 Delta-T 与闰秒数据模型                             |
-| C1   | M    | RFC 0005                  | `@epheon/reference`                                         |
-| C2   | M    | RFC 0006、C1              | `@epheon/ephemerides`                                       |
-| C3   | M    | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
-| C4   | M    | C1、C2、D1                | 太阳黄经最小 provider                                       |
-| C5   | M    | B3、C3、C4                | 二十四节气求解                                              |
-| C6   | L    | B3、C3、月亮黄经 provider | 朔望求解                                                    |
-| C7   | XL   | C5、C6                    | 中国历法规则包                                              |
-| D1   | M    | 无                        | 外部参考数据 bootstrap                                      |
+| 任务 | 大小 | 状态   | 前置条件                  | 输出                                                        |
+| ---- | ---- | ------ | ------------------------- | ----------------------------------------------------------- |
+| B3   | M    | 待开始 | C4、D1                    | RFC 0007 天象事件求解                                       |
+| B4   | M    | 已完成 | 无                        | RFC 0008 Delta-T 与闰秒数据模型                             |
+| C1   | M    | 待开始 | RFC 0005                  | `@epheon/reference`                                         |
+| C2   | M    | 待开始 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
+| C3   | M    | 已完成 | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
+| C4   | M    | 待开始 | C1、C2、D1                | 太阳黄经最小 provider                                       |
+| C5   | M    | 待开始 | B3、C3、C4                | 二十四节气求解                                              |
+| C6   | L    | 待开始 | B3、C3、月亮黄经 provider | 朔望求解                                                    |
+| C7   | XL   | 待开始 | C5、C6                    | 中国历法规则包                                              |
+| D1   | M    | 待开始 | 无                        | 外部参考数据 bootstrap                                      |
 
-## 五、任务详情
+## 五、当前进度
+
+截至 `2026-06-15`，第二阶段已经完成：
+
+```txt
+B4：RFC 0008 Delta-T 与闰秒数据模型
+C3：@epheon/dataset-delta-t 与 @epheon/dataset-leap-seconds
+```
+
+已验证：
+
+```bash
+CI=true pnpm format:check
+CI=true pnpm typecheck
+CI=true pnpm test
+CI=true pnpm build
+```
+
+## 六、任务详情
 
 ### B3：RFC 0007 天象事件求解
 
@@ -104,6 +122,14 @@ const 对象替代 enum，与 isolatedModules 兼容。
 ### B4：RFC 0008 Delta-T 与闰秒数据模型
 
 文件：`docs/rfcs/0008-delta-t-leap-second-data.md`
+
+当前状态：已完成（`2026-06-15`）
+
+已交付：
+
+```txt
+docs/rfcs/0008-delta-t-leap-second-data.md
+```
 
 验收标准：
 
@@ -187,6 +213,24 @@ packages/dataset-delta-t/
 packages/dataset-leap-seconds/
 ```
 
+当前状态：已完成（`2026-06-15`）
+
+已交付：
+
+```txt
+packages/dataset-delta-t/
+packages/dataset-leap-seconds/
+```
+
+当前实现说明：
+
+```txt
+dataset-delta-t 当前先使用 1600-2150 的分段 Delta-T 多项式模型。
+dataset-leap-seconds 当前内置 1972 年以来的 TAI-UTC 阶跃表。
+两者都显式导出 DatasetInfo，并在 coverage 外抛出 InvalidTimeScaleInput。
+核心 temporal 包仍不隐式加载 dataset。
+```
+
 验收标准：
 
 - `dataset-delta-t` 暴露 `createDeltaTProvider()`
@@ -240,26 +284,23 @@ packages/dataset-leap-seconds/
 - 脚本不纳入 pnpm workspace，不进入默认 CI
 - 不在此任务中向 `packages/` 写入代码
 
-## 六、推荐执行顺序
+## 七、推荐执行顺序
 
 第二阶段最小路径：
 
 ```txt
-1. B4
-2. D1
-3. C1
-4. C2
-5. C3
-6. C4
-7. B3
-8. C5
+1. D1
+2. C1
+3. C2
+4. C4
+5. B3
+6. C5
 ```
 
 可并行：
 
 ```txt
-B4 与 D1
-C1 与 B4
+D1 与 C1
 ```
 
 必须串行：
@@ -269,7 +310,7 @@ C1 -> C2 -> C4 -> B3 -> C5
 B4 -> C3 -> C5
 ```
 
-## 七、验证链路
+## 八、验证链路
 
 每个实现任务完成后运行：
 
