@@ -44,7 +44,7 @@ export function utcJulianDayToJulianEphemerisDay(
  * @param ttMinusUtc TT-UTC 时长。
  * @param deltaT Delta-T，即 TT-UT1。
  * @returns UT1-UTC 时长。
- * @throws PrimitiveError 当相减结果为 NaN 或 Infinity 时抛出，错误码为 InvalidNumber。
+ * @throws TemporalError 当 Duration.subtract 内部检测到非有限计算结果时抛出，错误码为 InvalidTimeScaleInput。
  */
 export function ttMinusUtcToUT1MinusUtc(ttMinusUtc: Duration, deltaT: Duration): Duration {
   return ttMinusUtc.subtract(deltaT);
