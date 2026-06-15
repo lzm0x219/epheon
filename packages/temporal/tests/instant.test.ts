@@ -49,7 +49,19 @@ describe("Instant", () => {
         expect(result.error.code).toBe(standard.code);
       }
 
-      expect(() => Instant.fromUTC(standard.input)).toThrow(TemporalError);
+      try {
+        Instant.fromUTC(standard.input);
+      } catch (error) {
+        expect(error).toBeInstanceOf(TemporalError);
+
+        if (error instanceof TemporalError) {
+          expect(error.code).toBe(standard.code);
+        }
+
+        continue;
+      }
+
+      throw new Error(`Expected TemporalError for ${standard.input}.`);
     }
   });
 

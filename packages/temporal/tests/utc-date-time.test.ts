@@ -122,4 +122,51 @@ describe("UtcDateTime", () => {
       })
     ).toThrow(TemporalError);
   });
+
+  it("throws TemporalError for month and day values outside Gregorian boundaries", () => {
+    for (const partialFields of [{ month: 0 }, { month: 13 }, { day: 0 }, { day: 31 }]) {
+      expect(() =>
+        UtcDateTime.fromFields({
+          year: 2026,
+          month: 4,
+          day: 1,
+          hour: 0,
+          minute: 0,
+          second: 0,
+          offsetMinutes: 0,
+          ...partialFields
+        })
+      ).toThrow(TemporalError);
+    }
+  });
+
+  it("throws TemporalError for UTC offsets outside plus or minus 23:59", () => {
+    for (const offsetMinutes of [-24 * 60, 24 * 60]) {
+      expect(() =>
+        UtcDateTime.fromFields({
+          year: 2026,
+          month: 1,
+          day: 1,
+          hour: 0,
+          minute: 0,
+          second: 0,
+          offsetMinutes
+        })
+      ).toThrow(TemporalError);
+    }
+  });
+
+  it("allows fractional seconds below 60", () => {
+    const utcDateTime = UtcDateTime.fromFields({
+      year: 2026,
+      month: 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      second: 59.999,
+      offsetMinutes: 0
+    });
+
+    expect(utcDateTime.second).toBe(59.999);
+  });
 });
