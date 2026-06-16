@@ -75,7 +75,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 | ---- | ---- | ------ | ------------------------- | ----------------------------------------------------------- |
 | B3   | M    | 待开始 | C4、D1                    | RFC 0007 天象事件求解                                       |
 | B4   | M    | 已完成 | 无                        | RFC 0008 Delta-T 与闰秒数据模型                             |
-| C1   | M    | 待开始 | RFC 0005                  | `@epheon/reference`                                         |
+| C1   | M    | 已完成 | RFC 0005                  | `@epheon/reference`                                         |
 | C2   | M    | 待开始 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
 | C3   | M    | 已完成 | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
 | C4   | M    | 待开始 | C1、C2、D1                | 太阳黄经最小 provider                                       |
@@ -97,6 +97,12 @@ C3：@epheon/dataset-delta-t 与 @epheon/dataset-leap-seconds
 
 ```txt
 D1：外部参考数据 bootstrap
+```
+
+截至 `2026-06-17`，第二阶段新增完成：
+
+```txt
+C1：@epheon/reference
 ```
 
 已验证：
@@ -149,6 +155,23 @@ docs/rfcs/0008-delta-t-leap-second-data.md
 ### C1：新建 `@epheon/reference`
 
 文件范围：`packages/reference/`
+
+当前状态：已完成（`2026-06-17`）
+
+已交付：
+
+```txt
+packages/reference/
+standards/reference/
+```
+
+当前实现说明：
+
+```txt
+当前公共入口导出 Body、Origin、CoordinateSystem、Distance、ReferenceFrame、SphericalCoordinates、Position。
+ReferenceFrame 当前只提供 ICRS、MeanOfDateEcliptic、TrueOfDateEcliptic 三个预设帧，不提前开放自定义构造。
+internal/cartesian.ts 提供球面与笛卡尔的内部转换，未从公共入口导出。
+```
 
 遵循 RFC 0005。该包只承载坐标和参考系语义，不实现星历算法。
 
