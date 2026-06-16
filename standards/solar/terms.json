@@ -1,0 +1,340 @@
+{
+  "solarTerms": [
+    {
+      "year": 2024,
+      "name": "小寒",
+      "targetLongitudeDegrees": 285,
+      "instant": "2024-01-05T20:49:24Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "大寒",
+      "targetLongitudeDegrees": 300,
+      "instant": "2024-01-20T14:07:22Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "立春",
+      "targetLongitudeDegrees": 315,
+      "instant": "2024-02-04T08:27:09Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "雨水",
+      "targetLongitudeDegrees": 330,
+      "instant": "2024-02-19T04:13:11Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "惊蛰",
+      "targetLongitudeDegrees": 345,
+      "instant": "2024-03-05T02:22:47Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "春分",
+      "targetLongitudeDegrees": 0,
+      "instant": "2024-03-20T03:06:25Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "清明",
+      "targetLongitudeDegrees": 15,
+      "instant": "2024-04-04T07:02:19Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "谷雨",
+      "targetLongitudeDegrees": 30,
+      "instant": "2024-04-19T13:59:47Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "立夏",
+      "targetLongitudeDegrees": 45,
+      "instant": "2024-05-05T00:10:06Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "小满",
+      "targetLongitudeDegrees": 60,
+      "instant": "2024-05-20T12:59:32Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "芒种",
+      "targetLongitudeDegrees": 75,
+      "instant": "2024-06-05T04:09:55Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "夏至",
+      "targetLongitudeDegrees": 90,
+      "instant": "2024-06-20T20:51:01Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "小暑",
+      "targetLongitudeDegrees": 105,
+      "instant": "2024-07-06T14:20:05Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "大暑",
+      "targetLongitudeDegrees": 120,
+      "instant": "2024-07-22T07:44:27Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "立秋",
+      "targetLongitudeDegrees": 135,
+      "instant": "2024-08-07T00:09:18Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "处暑",
+      "targetLongitudeDegrees": 150,
+      "instant": "2024-08-22T14:55:04Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "白露",
+      "targetLongitudeDegrees": 165,
+      "instant": "2024-09-07T03:11:22Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "秋分",
+      "targetLongitudeDegrees": 180,
+      "instant": "2024-09-22T12:43:41Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "寒露",
+      "targetLongitudeDegrees": 195,
+      "instant": "2024-10-07T18:59:58Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "霜降",
+      "targetLongitudeDegrees": 210,
+      "instant": "2024-10-22T22:14:46Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "立冬",
+      "targetLongitudeDegrees": 225,
+      "instant": "2024-11-06T22:20:06Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "小雪",
+      "targetLongitudeDegrees": 240,
+      "instant": "2024-11-21T19:56:31Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "大雪",
+      "targetLongitudeDegrees": 255,
+      "instant": "2024-12-06T15:17:04Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2024,
+      "name": "冬至",
+      "targetLongitudeDegrees": 270,
+      "instant": "2024-12-21T09:20:35Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "小寒",
+      "targetLongitudeDegrees": 285,
+      "instant": "2025-01-05T02:32:47Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "大寒",
+      "targetLongitudeDegrees": 300,
+      "instant": "2025-01-19T20:00:09Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "立春",
+      "targetLongitudeDegrees": 315,
+      "instant": "2025-02-03T14:10:29Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "雨水",
+      "targetLongitudeDegrees": 330,
+      "instant": "2025-02-18T10:06:35Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "惊蛰",
+      "targetLongitudeDegrees": 345,
+      "instant": "2025-03-05T08:07:17Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "春分",
+      "targetLongitudeDegrees": 0,
+      "instant": "2025-03-20T09:01:30Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "清明",
+      "targetLongitudeDegrees": 15,
+      "instant": "2025-04-04T12:48:35Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "谷雨",
+      "targetLongitudeDegrees": 30,
+      "instant": "2025-04-19T19:56:02Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "立夏",
+      "targetLongitudeDegrees": 45,
+      "instant": "2025-05-05T05:57:13Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "小满",
+      "targetLongitudeDegrees": 60,
+      "instant": "2025-05-20T18:54:39Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "芒种",
+      "targetLongitudeDegrees": 75,
+      "instant": "2025-06-05T09:56:32Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "夏至",
+      "targetLongitudeDegrees": 90,
+      "instant": "2025-06-21T02:42:17Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "小暑",
+      "targetLongitudeDegrees": 105,
+      "instant": "2025-07-06T20:05:00Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "大暑",
+      "targetLongitudeDegrees": 120,
+      "instant": "2025-07-22T13:29:28Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "立秋",
+      "targetLongitudeDegrees": 135,
+      "instant": "2025-08-07T05:51:36Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "处暑",
+      "targetLongitudeDegrees": 150,
+      "instant": "2025-08-22T20:33:53Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "白露",
+      "targetLongitudeDegrees": 165,
+      "instant": "2025-09-07T08:51:58Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "秋分",
+      "targetLongitudeDegrees": 180,
+      "instant": "2025-09-22T18:19:22Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "寒露",
+      "targetLongitudeDegrees": 195,
+      "instant": "2025-10-08T00:41:13Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "霜降",
+      "targetLongitudeDegrees": 210,
+      "instant": "2025-10-23T03:50:57Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "立冬",
+      "targetLongitudeDegrees": 225,
+      "instant": "2025-11-07T04:04:04Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "小雪",
+      "targetLongitudeDegrees": 240,
+      "instant": "2025-11-22T01:35:36Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "大雪",
+      "targetLongitudeDegrees": 255,
+      "instant": "2025-12-06T21:04:36Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    },
+    {
+      "year": 2025,
+      "name": "冬至",
+      "targetLongitudeDegrees": 270,
+      "instant": "2025-12-21T15:03:06Z",
+      "basis": "JPL Horizons API: geocentric apparent ecliptic longitude of the Sun (quantity 31, ObsEcLon), linearly interpolated from hourly UTC samples."
+    }
+  ]
+}

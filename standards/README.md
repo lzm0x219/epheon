@@ -30,6 +30,15 @@ standards/
     └── utc-invalid-inputs.json # 非法 UTC 输入样例
 ```
 
+第二阶段新增：
+
+```
+standards/
+└── solar/                # 太阳黄经与二十四节气参考数值
+    ├── longitudes.json   # 太阳视黄经样例
+    └── terms.json        # 二十四节气时刻样例
+```
+
 ## 字段约定
 
 每个 fixture 文件使用该领域最自然的 schema，而非统一的泛型模版。当前各文件结构如下：
@@ -108,6 +117,28 @@ standards/
 | `input`          | string   | 非法 UTC 字符串                       |
 | `code`           | string   | 预期错误码（如 `InvalidUTCDateTime`） |
 | `basis`          | string   | 该输入被判定为非法原因                |
+
+### `solar/longitudes.json`
+
+| 字段                | 类型     | 说明                         |
+| ------------------- | -------- | ---------------------------- |
+| `solarLongitudes[]` | 对象数组 | 太阳视黄经参考样例           |
+| `year`              | number   | 样例所在公历年份             |
+| `term`              | string   | 对应节气名                   |
+| `input`             | string   | UTC 字符串，带 `Z`           |
+| `longitudeDegrees`  | number   | 对应时刻太阳地心视黄经（度） |
+| `basis`             | string   | 外部参考来源与生成方法说明   |
+
+### `solar/terms.json`
+
+| 字段                     | 类型     | 说明                             |
+| ------------------------ | -------- | -------------------------------- |
+| `solarTerms[]`           | 对象数组 | 二十四节气时刻样例               |
+| `year`                   | number   | 节气所在公历年份                 |
+| `name`                   | string   | 节气名                           |
+| `targetLongitudeDegrees` | number   | 对应节气的目标黄经（度）         |
+| `instant`                | string   | 节气交接时刻，UTC 字符串，带 `Z` |
+| `basis`                  | string   | 外部参考来源与生成方法说明       |
 
 ## 维护规范
 
