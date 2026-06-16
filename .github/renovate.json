@@ -7,6 +7,10 @@
     {
       "groupName": "rsbuild",
       "matchPackageNames": ["@rsbuild/{/,}**"]
+    },
+    {
+      "groupName": "ox",
+      "matchPackageNames": ["ox**"]
     }
   ],
   "autoApprove": true,
