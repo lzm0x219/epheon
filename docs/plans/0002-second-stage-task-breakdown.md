@@ -82,7 +82,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 | C5   | M    | 待开始 | B3、C3、C4                | 二十四节气求解                                              |
 | C6   | L    | 待开始 | B3、C3、月亮黄经 provider | 朔望求解                                                    |
 | C7   | XL   | 待开始 | C5、C6                    | 中国历法规则包                                              |
-| D1   | M    | 待开始 | 无                        | 外部参考数据 bootstrap                                      |
+| D1   | M    | 已完成 | 无                        | 外部参考数据 bootstrap                                      |
 
 ## 五、当前进度
 
@@ -91,6 +91,12 @@ const 对象替代 enum，与 isolatedModules 兼容。
 ```txt
 B4：RFC 0008 Delta-T 与闰秒数据模型
 C3：@epheon/dataset-delta-t 与 @epheon/dataset-leap-seconds
+```
+
+截至 `2026-06-16`，第二阶段新增完成：
+
+```txt
+D1：外部参考数据 bootstrap
 ```
 
 已验证：
@@ -276,6 +282,25 @@ dataset-leap-seconds 当前内置 1972 年以来的 TAI-UTC 阶跃表。
 
 文件范围：`scripts/fetch-standards/`
 
+当前状态：已完成（`2026-06-16`）
+
+已交付：
+
+```txt
+scripts/fetch-standards/fetch-solar-standards.mjs
+scripts/fetch-standards/README.md
+standards/solar/longitudes.json
+standards/solar/terms.json
+```
+
+当前实现说明：
+
+```txt
+脚本使用官方 JPL Horizons API 的地心太阳视黄经（ObsEcLon, quantity 31）。
+当前先按小时 UTC 采样，再用线性插值估算 2024/2025 的 24 节气交接时刻。
+longitudes.json 当前直接复用节气交接时刻及对应目标黄经，作为 C4 的最小 bootstrap fixture。
+```
+
 验收标准：
 
 - 生成 2024 年和 2025 年的太阳黄经 fixture
@@ -289,12 +314,11 @@ dataset-leap-seconds 当前内置 1972 年以来的 TAI-UTC 阶跃表。
 第二阶段最小路径：
 
 ```txt
-1. D1
-2. C1
-3. C2
-4. C4
-5. B3
-6. C5
+1. C1
+2. C2
+3. C4
+4. B3
+5. C5
 ```
 
 可并行：
