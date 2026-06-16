@@ -1,195 +1,83 @@
-# Epheon
+<p align="center">
+  <img src="docs/assets/readme-banner.svg" alt="Epheon banner" width="100%" />
+</p>
 
-Epheon 是一个面向东亚历法体系的、标准驱动的天文历法引擎。
+<h1 align="center">Epheon</h1>
 
-它不是命理库，不是术数框架，也不是只靠查表的农历包。它的边界更窄，也更严格：
+<p align="center">
+  面向中国历法体系的、标准驱动的天文历法引擎。
+</p>
 
-```txt
-天文与历法属于 Epheon。
-解释与占断不属于 Epheon。
-```
+<p align="center">
+  只处理客观的天文与历法计算，不处理术数解释、流派判断或占断规则。
+</p>
 
-Epheon 用来回答这类问题：
+<p align="center">
+  <a href="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml/badge.svg" /></a>
+  <img alt="Node.js >=24.16.0" src="https://img.shields.io/badge/node-%3E%3D%2024.16.0-1F6FEB?logo=node.js&amp;logoColor=white" />
+  <img alt="pnpm 11.7.0" src="https://img.shields.io/badge/pnpm-11.7.0-F69220?logo=pnpm&amp;logoColor=white" />
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0B1F33.svg" /></a>
+</p>
 
-```txt
-一个时间点应该如何表示？
-一个民用时间对应哪个儒略日？
-某个时刻的太阳视黄经是多少？
-某一年的二十四节气分别发生在什么时候？
-朔日分别发生在什么时候？
-某个公历日期对应哪个中国历日期？
-某个时间对应的干支纪年、纪月、纪日、纪时是什么？
-```
+<p align="center">
+  <a href="#why-epheon">Why Epheon</a> ·
+  <a href="#current-packages">Packages</a> ·
+  <a href="#getting-started">Getting Started</a> ·
+  <a href="#repository-layout">Repository Layout</a> ·
+  <a href="#documentation">Documentation</a>
+</p>
 
-Epheon 不回答这类问题：
+## Why Epheon
 
-```txt
-这个八字好不好？
-这个紫微斗数命盘应该怎么解释？
-某个神煞在某个流派里是什么意思？
-应该采用哪个占断规则？
-```
+Epheon 为中国历法相关软件提供一层可靠、可验证、可复现的天文历法基础设施。它优先解决最容易出错、也最值得长期稳定的部分：时间模型、儒略日、时间尺度、精度与容差，以及可替换的数据 provider。
 
-## 当前状态
+很多相关系统的问题，不在于“功能不够多”，而在于边界不够清楚。当天文计算、历法规则和术数解释混在一起，结果就会变得难以验证、难以复用，也难以长期维护。
 
-Epheon 已完成第一阶段工程基线与时间内核收口，正在进入第二阶段设计与实现准备。
+Epheon 的选择很简单：把客观计算与主观解释分开。先把底层做准，再让上层系统在清晰边界之上自由构建。
 
-当前仓库状态：
+| Epheon 负责                            | Epheon 不负责              |
+| -------------------------------------- | -------------------------- |
+| 时间与历法相关的基础值类型与时间模型   | 八字、紫微斗数等解释性功能 |
+| 儒略日、时间尺度、精度与容差等基础能力 | 神煞、格局、吉凶等主观判断 |
+| 后续的天象事件、中国历法规则与标准数据 | 某一流派的占断规则编排     |
 
-```txt
-docs/rfcs/0001-architecture.md
-docs/rfcs/0002-engineering-foundation.md
-docs/rfcs/0003-temporal-model.md
-docs/rfcs/0004-primitives-api.md
-docs/rfcs/0005-coordinate-reference-model.md
-docs/rfcs/0006-ephemeris-provider.md
-docs/plans/0001-first-stage-task-breakdown.md
-docs/plans/0002-second-stage-task-breakdown.md
-packages/primitives/
-packages/temporal/
-standards/primitives/
-standards/temporal/
-standards/README.md
-conformance/README.md
-benchmarks/README.md
-.github/workflows/ci.yml
-```
+## Current Packages
 
-当前已经具备第一阶段源码、标准 fixture、测试、构建配置与 GitHub CI。
-`@epheon/primitives` 已包含 Angle、Duration、Vector3、Result 与 Tolerance；
-`@epheon/temporal` 已包含 Instant、Julian Day、Julian Ephemeris Day、UTC 输入边界、
-TT/UT1 表达与 provider 骨架。
+仓库已完成第一阶段工程基线，当前以两个核心包为主，并为第二阶段数据能力预留了独立包边界。
 
-## 架构
+| Package                                                  | 说明                                              |
+| -------------------------------------------------------- | ------------------------------------------------- |
+| [`@epheon/primitives`](packages/primitives/)             | 基础值类型、误差表达与通用数学原语                |
+| [`@epheon/temporal`](packages/temporal/)                 | 时间模型、Julian Day、UTC/TT 边界与 provider 骨架 |
+| [`dataset-delta-t`](packages/dataset-delta-t/)           | Delta-T 数据集包骨架                              |
+| [`dataset-leap-seconds`](packages/dataset-leap-seconds/) | 闰秒数据集包骨架                                  |
 
-长期架构分为三部分：
+第二阶段将继续围绕参考系、星历 provider、闰秒与 Delta-T 数据模型，以及后续历法能力展开。
 
-```txt
-Specification
-Engine
-Distribution
-```
+## Getting Started
 
-计划中的包分层：
+### Requirements
 
-```txt
-@epheon/spec
+- Node.js `>= 24.16.0`
+- pnpm `11.7.0`
 
-@epheon/primitives
-@epheon/temporal
-@epheon/reference
-
-@epheon/ephemerides
-@epheon/ephemerides-vsop87
-@epheon/ephemerides-elp2000
-@epheon/ephemerides-jpl
-
-@epheon/phenomena
-
-@epheon/calendars
-@epheon/calendar-gregorian
-@epheon/calendar-julian
-@epheon/calendar-chinese
-
-@epheon/dataset-*
-
-@epheon/standards
-@epheon/conformance
-@epheon/benchmarks
-
-@epheon/compat
-@epheon/runtime
-@epheon/cli
-```
-
-依赖方向必须保持单向：
-
-```txt
-primitives -> temporal -> reference -> ephemerides -> phenomena -> calendars
-```
-
-低层包不得依赖高层历法包、CLI、playground 或任何解释性逻辑。
-
-## 第一阶段
-
-第一阶段只聚焦：
-
-```txt
-@epheon/primitives
-@epheon/temporal
-```
-
-最小目标：
-
-```txt
-Angle
-Duration
-Instant
-Julian Day
-UTC input
-TT representation
-Delta-T provider interface
-explicit precision and tolerance rules
-```
-
-当前已完成第一阶段目标。后续工作转向 `@epheon/reference`、星历 provider、Delta-T
-数据模型、闰秒数据模型和天象事件求解。
-
-当前公共 API 边界：
-
-```txt
-@epheon/primitives: Angle, Duration, Vector3, Result, Tolerance, PrimitiveError
-@epheon/temporal: Instant, JulianDay, JulianEphemerisDay, UtcDateTime, provider 类型与固定 provider helper, TemporalError
-```
-
-`@epheon/primitives` 第一阶段暂缓 Interval 与 Maybe，当前不导出。`@epheon/temporal` 暂未导出
-Gregorian 辅助函数、UTC 字符串解析器、时间常量或其他 `src/internal/` 实现细节。
-
-第一阶段有意排除：
-
-```txt
-VSOP87
-ELP2000
-JPL ephemerides
-solar terms
-new moons
-Chinese calendar rules
-CLI
-playground
-```
-
-## 工程
-
-Epheon 当前使用：
-
-```txt
-pnpm workspace
-TypeScript
-tsdown
-Vitest
-Oxlint
-Oxfmt
-Lefthook
-Moonrepo
-Changesets
-```
-
-常用命令：
+### Install
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm lint
-pnpm format:check
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm exec lefthook run pre-commit
-pnpm exec moon run :build
-pnpm exec changeset
 ```
 
-本地非交互环境和 CI 中推荐显式设置 `CI=true`，避免 pnpm 在非 TTY
-环境触发模块清理确认：
+### Verify
+
+```bash
+pnpm test
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm build
+```
+
+在非交互环境中，建议显式设置 `CI=true`，避免 pnpm 触发模块清理确认：
 
 ```bash
 CI=true pnpm test
@@ -197,65 +85,38 @@ CI=true pnpm typecheck
 CI=true pnpm build
 ```
 
-当前根命令已可用于验证第一阶段包的构建、测试、类型检查、lint 与格式化状态。
-GitHub CI 已在 pull request 与 `main` 分支 push 时运行同一组核心检查。
+提交前可手动运行：
 
-## 设计原则
-
-Epheon 遵循这些原则：
-
-```txt
-标准优先
-只处理客观天文与历法
-算法与数据分离
-接口与实现分离
-正确性比功能数量更重要
-精度必须显式表达
-值对象表达领域概念
-纯函数实现核心算法
-provider 注入外部数据
+```bash
+pnpm exec lefthook run pre-commit
 ```
 
-核心包应避免：
+## Repository Layout
 
-```txt
-隐式读取系统时区
-隐式读取文件系统
-隐式发起网络请求
-全局可变状态
-在内核中依赖外部日期库
-内嵌大型天文数据集
-```
+| 路径                             | 用途                      |
+| -------------------------------- | ------------------------- |
+| [`docs/rfcs/`](docs/rfcs/)       | 架构、边界与公共 API 决策 |
+| [`docs/plans/`](docs/plans/)     | 阶段任务拆分与实现计划    |
+| [`docs/reviews/`](docs/reviews/) | 设计与实现对照审查记录    |
+| [`packages/`](packages/)         | 工作区包                  |
+| [`standards/`](standards/)       | 标准 fixture 与参考数据   |
+| [`conformance/`](conformance/)   | 跨实现正确性校验          |
+| [`benchmarks/`](benchmarks/)     | 性能测试                  |
 
-外部日期库应该进入未来的兼容层 package，而不是进入核心时间模型。
+## Design Constraints
 
-## RFCs
+- 核心包只处理客观天文与历法问题，不承载解释性逻辑
+- 精度、单位与容差必须显式表达，不依赖隐含约定
+- 核心逻辑保持纯净，不隐式读取文件系统、网络、系统时区或全局可变状态
+- 公共 API 以各包 `src/index.ts` 为边界，内部实现细节不对外暴露
 
-项目当前由这些 RFC 指导：
+## Documentation
 
-```txt
-0001-architecture.md
-0002-engineering-foundation.md
-0003-temporal-model.md
-0004-primitives-api.md
-0005-coordinate-reference-model.md
-0006-ephemeris-provider.md
-```
+- 架构与设计决策：[`docs/rfcs/`](docs/rfcs/)
+- 阶段计划：[`docs/plans/`](docs/plans/)
+- 第一阶段审查记录：[`docs/reviews/0001-rfc-vs-code-audit.md`](docs/reviews/0001-rfc-vs-code-audit.md)
+- 包级说明：[`packages/primitives/README.md`](packages/primitives/README.md)、[`packages/temporal/README.md`](packages/temporal/README.md)
 
-如果新的架构决策会影响公共 API、包边界、精度策略、验证数据或长期兼容性，应先写入 RFC，再进入实现。
-
-## 阶段计划
-
-阶段计划见：
-
-```txt
-docs/plans/0001-first-stage-task-breakdown.md
-docs/plans/0002-second-stage-task-breakdown.md
-```
-
-第一阶段计划记录已完成范围和关键决策。第二阶段计划拆分 reference、ephemerides、
-dataset、phenomena 和后续中国历法任务。
-
-## 许可证
+## License
 
 MIT
