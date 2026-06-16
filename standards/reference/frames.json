@@ -1,0 +1,19 @@
+{
+  "frames": [
+    {
+      "name": "ICRS",
+      "coordinateSystem": "EQUATORIAL",
+      "epochJde": 2451545
+    },
+    {
+      "name": "MeanOfDateEcliptic",
+      "coordinateSystem": "ECLIPTIC",
+      "epochJde": null
+    },
+    {
+      "name": "TrueOfDateEcliptic",
+      "coordinateSystem": "ECLIPTIC",
+      "epochJde": null
+    }
+  ]
+}

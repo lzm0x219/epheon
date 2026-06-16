@@ -24,121 +24,212 @@ standards/
 │   ├── angles.json       # 角度转换与归一化样例
 │   ├── durations.json    # 时长转换样例
 │   └── vectors.json      # 三维向量运算样例
+├── reference/            # 坐标与参考系参考数值
+│   ├── coordinates.json  # 球面坐标与内部笛卡尔转换样例
+│   └── frames.json       # ReferenceFrame 预设帧样例
+├── solar/                # 太阳黄经与二十四节气参考数值
+│   ├── longitudes.json   # 太阳视黄经样例
+│   └── terms.json        # 二十四节气时刻样例
 └── temporal/             # @epheon/temporal 的参考数值
     ├── julian-days.json        # Julian Day 转换样例
     ├── time-scales.json        # 时间尺度转换样例
     └── utc-invalid-inputs.json # 非法 UTC 输入样例
 ```
 
-第二阶段新增：
-
-```
-standards/
-└── solar/                # 太阳黄经与二十四节气参考数值
-    ├── longitudes.json   # 太阳视黄经样例
-    └── terms.json        # 二十四节气时刻样例
-```
-
 ## 字段约定
 
-每个 fixture 文件使用该领域最自然的 schema，而非统一的泛型模版。当前各文件结构如下：
+每个 fixture 文件使用该领域最自然的 schema，而非统一的泛型模版。
+
+为避免随着目录增多后出现大量 `foo[].bar.baz` 形式的长路径，下面统一按三层展示：
+
+- `根结构`：文件顶层字段，先快速说明这个文件装了什么
+- `条目字段`：数组元素或顶层对象的直接字段
+- `内嵌对象字段`：只有存在对象嵌套时才展开
+
+### 快速索引
+
+| 文件                               | 根结构                             | 说明                  |
+| ---------------------------------- | ---------------------------------- | --------------------- |
+| `primitives/angles.json`           | `conversions[]`、`normalization[]` | 角度单位转换与归一化  |
+| `primitives/durations.json`        | `conversions[]`                    | 时长单位转换          |
+| `primitives/vectors.json`          | `vectors[]`、`operations[]`        | 向量数值与运算结果    |
+| `reference/coordinates.json`       | `coordinates[]`                    | 球面坐标与笛卡尔转换  |
+| `reference/frames.json`            | `frames[]`                         | 预设参考系定义        |
+| `solar/longitudes.json`            | `solarLongitudes[]`                | 太阳视黄经参考样例    |
+| `solar/terms.json`                 | `solarTerms[]`                     | 二十四节气时刻样例    |
+| `temporal/julian-days.json`        | `utcInstants[]`                    | UTC 与 JD 映射        |
+| `temporal/time-scales.json`        | `timeScaleConversions[]`           | UTC 与各时间尺度转换  |
+| `temporal/utc-invalid-inputs.json` | `utcDateTimes[]`                   | 非法 UTC 输入与错误码 |
 
 ### `primitives/angles.json`
 
-| 字段                                | 类型     | 说明                     |
-| ----------------------------------- | -------- | ------------------------ |
-| `conversions[]`                     | 对象数组 | 同一角度的多单位等价表示 |
-| `conversions[].degrees`             | number   | 度数                     |
-| `conversions[].radians`             | number   | 弧度                     |
-| `conversions[].turns`               | number   | 圈数                     |
-| `conversions[].arcminutes`          | number   | 角分                     |
-| `conversions[].arcseconds`          | number   | 角秒                     |
-| `normalization[]`                   | 对象数组 | 角度归一化前后的对比     |
-| `normalization[].degrees`           | number   | 原始角度                 |
-| `normalization[].normalizedDegrees` | number   | [0°, 360°) 归一化        |
-| `normalization[].signedDegrees`     | number   | [-180°, 180°) 归约       |
+根结构：`{ conversions: AngleConversion[]; normalization: AngleNormalization[] }`
+
+`conversions[]`
+
+| 字段         | 类型   | 说明 |
+| ------------ | ------ | ---- |
+| `degrees`    | number | 度数 |
+| `radians`    | number | 弧度 |
+| `turns`      | number | 圈数 |
+| `arcminutes` | number | 角分 |
+| `arcseconds` | number | 角秒 |
+
+`normalization[]`
+
+| 字段                | 类型   | 说明                     |
+| ------------------- | ------ | ------------------------ |
+| `degrees`           | number | 原始角度                 |
+| `normalizedDegrees` | number | `[0°, 360°)` 归一化结果  |
+| `signedDegrees`     | number | `[-180°, 180°)` 归约结果 |
 
 ### `primitives/durations.json`
 
-| 字段                            | 类型     | 说明                     |
-| ------------------------------- | -------- | ------------------------ |
-| `conversions[]`                 | 对象数组 | 同一时长的多单位等价表示 |
-| `conversions[].seconds`         | number   | 秒（basis unit）         |
-| `conversions[].milliseconds`    | number   | 毫秒                     |
-| `conversions[].days`            | number   | 日                       |
-| `conversions[].julianYears`     | number   | 儒略年（365.25 日）      |
-| `conversions[].julianCenturies` | number   | 儒略世纪（36525 日）     |
+根结构：`{ conversions: DurationConversion[] }`
+
+`conversions[]`
+
+| 字段              | 类型   | 说明                 |
+| ----------------- | ------ | -------------------- |
+| `seconds`         | number | 秒（basis unit）     |
+| `milliseconds`    | number | 毫秒                 |
+| `days`            | number | 日                   |
+| `julianYears`     | number | 儒略年（365.25 日）  |
+| `julianCenturies` | number | 儒略世纪（36525 日） |
 
 ### `primitives/vectors.json`
 
-| 字段                    | 类型     | 说明                         |
-| ----------------------- | -------- | ---------------------------- |
-| `vectors[]`             | 对象数组 | 向量样例，含分量与模长       |
-| `vectors[].x`           | number   | X 分量                       |
-| `vectors[].y`           | number   | Y 分量                       |
-| `vectors[].z`           | number   | Z 分量                       |
-| `vectors[].magnitude`   | number   | 欧几里得范数 √(x² + y² + z²) |
-| `operations[]`          | 对象数组 | 向量运算对偶样例             |
-| `operations[].a`        | object   | 运算的第一个向量 `{x, y, z}` |
-| `operations[].b`        | object   | 运算的第二个向量 `{x, y, z}` |
-| `operations[].add`      | object   | a + b 结果向量               |
-| `operations[].subtract` | object   | a − b 结果向量               |
-| `operations[].dot`      | number   | a · b 点积                   |
-| `operations[].cross`    | object   | a × b 叉积结果向量           |
+根结构：`{ vectors: VectorSample[]; operations: VectorOperation[] }`
+
+`vectors[]`
+
+| 字段        | 类型   | 说明                                 |
+| ----------- | ------ | ------------------------------------ |
+| `x`         | number | X 分量                               |
+| `y`         | number | Y 分量                               |
+| `z`         | number | Z 分量                               |
+| `magnitude` | number | 欧几里得范数 `sqrt(x^2 + y^2 + z^2)` |
+
+`operations[]`
+
+| 字段       | 类型   | 说明                 |
+| ---------- | ------ | -------------------- |
+| `a`        | object | 运算的第一个向量     |
+| `b`        | object | 运算的第二个向量     |
+| `add`      | object | `a + b` 结果向量     |
+| `subtract` | object | `a - b` 结果向量     |
+| `dot`      | number | `a · b` 点积         |
+| `cross`    | object | `a × b` 叉积结果向量 |
+
+`operations[].a`、`operations[].b`、`operations[].add`、`operations[].subtract`、`operations[].cross`
+
+| 字段 | 类型   | 说明   |
+| ---- | ------ | ------ |
+| `x`  | number | X 分量 |
+| `y`  | number | Y 分量 |
+| `z`  | number | Z 分量 |
+
+### `reference/coordinates.json`
+
+根结构：`{ coordinates: CoordinateSample[] }`
+
+`coordinates[]`
+
+| 字段               | 类型   | 说明                 |
+| ------------------ | ------ | -------------------- |
+| `longitudeDegrees` | number | 球面经度（度）       |
+| `latitudeDegrees`  | number | 球面纬度（度）       |
+| `distanceAu`       | number | 对应距离（AU）       |
+| `cartesian`        | object | 对应的内部笛卡尔向量 |
+
+`coordinates[].cartesian`
+
+| 字段 | 类型   | 说明         |
+| ---- | ------ | ------------ |
+| `x`  | number | X 分量（AU） |
+| `y`  | number | Y 分量（AU） |
+| `z`  | number | Z 分量（AU） |
+
+### `reference/frames.json`
+
+根结构：`{ frames: ReferenceFrameSample[] }`
+
+`frames[]`
+
+| 字段               | 类型             | 说明                                |
+| ------------------ | ---------------- | ----------------------------------- |
+| `name`             | string           | 预设帧稳定名称                      |
+| `coordinateSystem` | string           | 对应坐标系统                        |
+| `epochJde`         | `number \| null` | 固定历元的 JDE；瞬时历元帧为 `null` |
 
 ### `temporal/julian-days.json`
 
-| 字段            | 类型     | 说明                         |
-| --------------- | -------- | ---------------------------- |
-| `utcInstants[]` | 对象数组 | UTC 时刻到 Julian Day 的映射 |
-| `input`         | string   | UTC 字符串，带时区偏移       |
-| `julianDay`     | number   | 对应的 Julian Day 数值       |
-| `basis` (可选)  | string   | 数据来源或计算公式           |
+根结构：`{ utcInstants: JulianDayFixture[] }`
+
+`utcInstants[]`
+
+| 字段        | 类型         | 说明                   |
+| ----------- | ------------ | ---------------------- |
+| `input`     | string       | UTC 字符串，带时区偏移 |
+| `julianDay` | number       | 对应的 Julian Day 数值 |
+| `basis`     | string，可选 | 数据来源或计算公式     |
 
 ### `temporal/time-scales.json`
 
-| 字段                     | 类型     | 说明                           |
-| ------------------------ | -------- | ------------------------------ |
-| `timeScaleConversions[]` | 对象数组 | UTC 时刻向各时间尺度的转换结果 |
-| `input`                  | string   | UTC 字符串，带时区偏移         |
-| `julianDay`              | number   | 对应的 JD                      |
-| `taiMinusUtcSeconds`     | number   | TAI − UTC （闰秒累计偏移）     |
-| `deltaTSeconds`          | number   | ΔT = TT − UT1                  |
-| `ttMinusUtcSeconds`      | number   | TT − UTC                       |
-| `ut1MinusUtcSeconds`     | number   | UT1 − UTC                      |
-| `julianEphemerisDay`     | number   | 对应的 JDE                     |
-| `basis` (可选)           | string   | 计算说明或公式参考             |
+根结构：`{ timeScaleConversions: TimeScaleConversion[] }`
+
+`timeScaleConversions[]`
+
+| 字段                 | 类型         | 说明                      |
+| -------------------- | ------------ | ------------------------- |
+| `input`              | string       | UTC 字符串，带时区偏移    |
+| `julianDay`          | number       | 对应的 JD                 |
+| `taiMinusUtcSeconds` | number       | `TAI - UTC`，闰秒累计偏移 |
+| `deltaTSeconds`      | number       | `ΔT = TT - UT1`           |
+| `ttMinusUtcSeconds`  | number       | `TT - UTC`                |
+| `ut1MinusUtcSeconds` | number       | `UT1 - UTC`               |
+| `julianEphemerisDay` | number       | 对应的 JDE                |
+| `basis`              | string，可选 | 计算说明或公式参考        |
 
 ### `temporal/utc-invalid-inputs.json`
 
-| 字段             | 类型     | 说明                                  |
-| ---------------- | -------- | ------------------------------------- |
-| `utcDateTimes[]` | 对象数组 | 非法 UTC 输入与预期错误码             |
-| `input`          | string   | 非法 UTC 字符串                       |
-| `code`           | string   | 预期错误码（如 `InvalidUTCDateTime`） |
-| `basis`          | string   | 该输入被判定为非法原因                |
+根结构：`{ utcDateTimes: InvalidUtcInput[] }`
+
+`utcDateTimes[]`
+
+| 字段    | 类型   | 说明                                |
+| ------- | ------ | ----------------------------------- |
+| `input` | string | 非法 UTC 字符串                     |
+| `code`  | string | 预期错误码，如 `InvalidUTCDateTime` |
+| `basis` | string | 该输入被判定为非法原因              |
 
 ### `solar/longitudes.json`
 
-| 字段                | 类型     | 说明                         |
-| ------------------- | -------- | ---------------------------- |
-| `solarLongitudes[]` | 对象数组 | 太阳视黄经参考样例           |
-| `year`              | number   | 样例所在公历年份             |
-| `term`              | string   | 对应节气名                   |
-| `input`             | string   | UTC 字符串，带 `Z`           |
-| `longitudeDegrees`  | number   | 对应时刻太阳地心视黄经（度） |
-| `basis`             | string   | 外部参考来源与生成方法说明   |
+根结构：`{ solarLongitudes: SolarLongitudeSample[] }`
+
+`solarLongitudes[]`
+
+| 字段               | 类型   | 说明                         |
+| ------------------ | ------ | ---------------------------- |
+| `year`             | number | 样例所在公历年份             |
+| `term`             | string | 对应节气名                   |
+| `input`            | string | UTC 字符串，带 `Z`           |
+| `longitudeDegrees` | number | 对应时刻太阳地心视黄经（度） |
+| `basis`            | string | 外部参考来源与生成方法说明   |
 
 ### `solar/terms.json`
 
-| 字段                     | 类型     | 说明                             |
-| ------------------------ | -------- | -------------------------------- |
-| `solarTerms[]`           | 对象数组 | 二十四节气时刻样例               |
-| `year`                   | number   | 节气所在公历年份                 |
-| `name`                   | string   | 节气名                           |
-| `targetLongitudeDegrees` | number   | 对应节气的目标黄经（度）         |
-| `instant`                | string   | 节气交接时刻，UTC 字符串，带 `Z` |
-| `basis`                  | string   | 外部参考来源与生成方法说明       |
+根结构：`{ solarTerms: SolarTermSample[] }`
+
+`solarTerms[]`
+
+| 字段                     | 类型   | 说明                             |
+| ------------------------ | ------ | -------------------------------- |
+| `year`                   | number | 节气所在公历年份                 |
+| `name`                   | string | 节气名                           |
+| `targetLongitudeDegrees` | number | 对应节气的目标黄经（度）         |
+| `instant`                | string | 节气交接时刻，UTC 字符串，带 `Z` |
+| `basis`                  | string | 外部参考来源与生成方法说明       |
 
 ## 维护规范
 
