@@ -111,7 +111,7 @@ standards/temporal/
 使用 `pnpm`，当前版本由根 `package.json` 固定：
 
 ```txt
-pnpm 11.6.0
+pnpm 11.7.0
 ```
 
 原因：
@@ -289,8 +289,8 @@ npm、Yarn、Bun lockfile，也不通过新增脚本包装 `CI=true`，保持根
 当前版本：
 
 ```txt
-vitest 4.1.8
-@vitest/coverage-v8 4.1.8
+vitest 4.1.9
+@vitest/coverage-v8 4.1.9
 ```
 
 当前根 `vitest.config.ts`：
@@ -470,13 +470,13 @@ vitest
 
 ```txt
 @moonrepo/cli: 2.3.3
-@vitest/coverage-v8: 4.1.8
+@vitest/coverage-v8: 4.1.9
 @types/node: 25.9.3
 @typescript/native-preview: 7.0.0-dev.20260614.1
 @changesets/cli: 3.0.0-next.5
 @changesets/types: 6.1.0
 vite: 8.0.16
-vitest: 4.1.8
+vitest: 4.1.9
 lefthook: 2.1.9
 oxfmt: 0.54.0
 oxlint: 1.69.0
