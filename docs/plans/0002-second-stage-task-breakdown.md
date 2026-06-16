@@ -76,7 +76,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 | B3   | M    | 待开始 | C4、D1                    | RFC 0007 天象事件求解                                       |
 | B4   | M    | 已完成 | 无                        | RFC 0008 Delta-T 与闰秒数据模型                             |
 | C1   | M    | 已完成 | RFC 0005                  | `@epheon/reference`                                         |
-| C2   | M    | 待开始 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
+| C2   | M    | 已完成 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
 | C3   | M    | 已完成 | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
 | C4   | M    | 待开始 | C1、C2、D1                | 太阳黄经最小 provider                                       |
 | C5   | M    | 待开始 | B3、C3、C4                | 二十四节气求解                                              |
@@ -103,12 +103,14 @@ D1：外部参考数据 bootstrap
 
 ```txt
 C1：@epheon/reference
+C2：@epheon/ephemerides
 ```
 
 已验证：
 
 ```bash
 CI=true pnpm format:check
+CI=true pnpm lint
 CI=true pnpm typecheck
 CI=true pnpm test
 CI=true pnpm build
@@ -209,6 +211,23 @@ packages/reference/
 文件范围：`packages/ephemerides/`
 
 该包只定义抽象接口，不包含具体星历算法。
+
+当前状态：已完成（`2026-06-17`）
+
+已交付：
+
+```txt
+packages/ephemerides/
+```
+
+当前实现说明：
+
+```txt
+当前公共入口导出 EphemerisProvider、EphemerisOptions、Precision、EphemerisError 与 toEphemerisError。
+ephemeris-provider.ts 提供 resolveEphemerisOptions()，统一补齐默认 frame=ReferenceFrame.MeanOfDateEcliptic 与 precision=Precision.Standard。
+tests/ephemerides.test.ts 当前覆盖 Precision 稳定标签、默认 options 行为和结构化错误边界。
+README 已记录该包只承载抽象协议，不包含 VSOP87、ELP2000、JPL 或任何具体算法。
+```
 
 最小目录结构：
 
