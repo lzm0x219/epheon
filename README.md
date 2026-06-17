@@ -14,9 +14,9 @@
 
 <p align="center">
   <a href="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Node.js 24.16+" src="https://img.shields.io/badge/Node.js-24.16%2B-339933?logo=nodedotjs&amp;logoColor=white" />
-  <img alt="pnpm 11.7.0" src="https://img.shields.io/badge/pnpm-11.7.0-F69220?logo=pnpm&amp;logoColor=white" />
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0B1F33.svg" /></a>
+  <img alt="Node.js 24.16+" src="https://badges.ws/badge/Node.js-24.16%2B-339933?logo=nodedotjs&amp;logoColor=white" />
+  <img alt="pnpm 11.7.0" src="https://badges.ws/badge/pnpm-11.7.0-F69220?logo=pnpm&amp;logoColor=white" />
+  <a href="LICENSE"><img alt="License: MIT" src="https://badges.ws/github/license/lzm0x219/epheon" /></a>
 </p>
 
 <p align="center">
