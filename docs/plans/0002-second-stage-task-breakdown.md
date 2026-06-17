@@ -78,7 +78,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 | C1   | M    | 已完成 | RFC 0005                  | `@epheon/reference`                                         |
 | C2   | M    | 已完成 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
 | C3   | M    | 已完成 | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
-| C4   | M    | 待开始 | C1、C2、D1                | 太阳黄经最小 provider                                       |
+| C4   | M    | 已完成 | C1、C2、D1                | 太阳黄经最小 provider                                       |
 | C5   | M    | 待开始 | B3、C3、C4                | 二十四节气求解                                              |
 | C6   | L    | 待开始 | B3、C3、月亮黄经 provider | 朔望求解                                                    |
 | C7   | XL   | 待开始 | C5、C6                    | 中国历法规则包                                              |
@@ -104,6 +104,7 @@ D1：外部参考数据 bootstrap
 ```txt
 C1：@epheon/reference
 C2：@epheon/ephemerides
+C4：太阳黄经最小 provider
 ```
 
 已验证：
@@ -292,6 +293,22 @@ dataset-leap-seconds 当前内置 1972 年以来的 TAI-UTC 阶跃表。
 文件范围：`packages/ephemerides-vsop87/`
 
 说明：实现太阳黄经最小能力，目标是让节气求解有可验证的太阳位置输入。具体算法名称和精度上限以 RFC 0006 与实现说明为准。
+
+当前状态：已完成（`2026-06-17`）
+
+已交付：
+
+```txt
+packages/ephemerides-vsop87/
+```
+
+当前实现说明：
+
+```txt
+当前公共入口导出 createVSOP87SunProvider()、solarEclipticLongitude()、solarEclipticPosition()。
+provider 当前只支持 Body.Sun、ReferenceFrame.MeanOfDateEcliptic、ReferenceFrame.TrueOfDateEcliptic 与 Precision.Standard。
+实现使用低阶太阳黄经近似模型输出地心黄道 Position，并在 tests/solar-provider.test.ts 中用 standards/solar/longitudes.json 验证 bootstrap 精度。
+```
 
 验收标准：
 
