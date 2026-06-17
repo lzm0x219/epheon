@@ -1,0 +1,14 @@
+{
+  "syzygies": [
+    {
+      "type": "newMoon",
+      "instant": "2024-04-08T18:21:00Z",
+      "expectedElongationDegrees": 0
+    },
+    {
+      "type": "fullMoon",
+      "instant": "2025-03-14T06:55:00Z",
+      "expectedElongationDegrees": 180
+    }
+  ]
+}
