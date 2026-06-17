@@ -172,6 +172,31 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  packages/phenomena:
+    dependencies:
+      '@epheon/ephemerides':
+        specifier: workspace:*
+        version: link:../ephemerides
+      '@epheon/primitives':
+        specifier: workspace:*
+        version: link:../primitives
+      '@epheon/reference':
+        specifier: workspace:*
+        version: link:../reference
+      '@epheon/temporal':
+        specifier: workspace:*
+        version: link:../temporal
+    devDependencies:
+      '@typescript/native-preview':
+        specifier: 'catalog:'
+        version: 7.0.0-dev.20260614.1
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.22.3(@typescript/native-preview@7.0.0-dev.20260614.1)(publint@0.3.21)(typescript@6.0.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   packages/primitives:
     devDependencies:
       '@typescript/native-preview':

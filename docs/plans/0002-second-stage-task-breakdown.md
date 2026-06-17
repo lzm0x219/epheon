@@ -79,7 +79,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 | C2   | M    | 已完成 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
 | C3   | M    | 已完成 | B4                        | `@epheon/dataset-delta-t` 与 `@epheon/dataset-leap-seconds` |
 | C4   | M    | 已完成 | C1、C2、D1                | 太阳黄经最小 provider                                       |
-| C5   | M    | 待开始 | B3、C3、C4                | 二十四节气求解                                              |
+| C5   | M    | 已完成 | B3、C3、C4                | 二十四节气求解                                              |
 | C6   | L    | 待开始 | B3、C3、月亮黄经 provider | 朔望求解                                                    |
 | C7   | XL   | 待开始 | C5、C6                    | 中国历法规则包                                              |
 | D1   | M    | 已完成 | 无                        | 外部参考数据 bootstrap                                      |
@@ -106,6 +106,7 @@ B3：RFC 0007 天象事件求解
 C1：@epheon/reference
 C2：@epheon/ephemerides
 C4：太阳黄经最小 provider
+C5：二十四节气求解
 ```
 
 已验证：
@@ -338,6 +339,22 @@ provider 当前只支持 Body.Sun、ReferenceFrame.MeanOfDateEcliptic、Referenc
 ### C5：节气求解
 
 文件范围：`packages/phenomena/`
+
+当前状态：已完成（`2026-06-17`）
+
+已交付：
+
+```txt
+packages/phenomena/
+```
+
+当前实现说明：
+
+```txt
+当前公共入口导出 SolarTermName、PhenomenaContext、SolarTermEvent 与 solarTermsOfYear()。
+实现显式请求太阳地心视黄经（Body.Sun + ReferenceFrame.TrueOfDateEcliptic），先按 1 日步进寻找包围区间，再用二分法细化到秒级。
+tests/solar-terms.test.ts 当前使用 standards/solar/terms.json 验证 2024 与 2025 年 24 个节气时刻，并显式声明 30 分钟时间 tolerance。
+```
 
 验收标准：
 
