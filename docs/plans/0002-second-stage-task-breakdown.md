@@ -53,7 +53,7 @@ CI=true pnpm build
 
 | RFC  | 主题                   | 状态   | 阻塞任务 |
 | ---- | ---------------------- | ------ | -------- |
-| 0007 | 天象事件求解           | 待开始 | C5、C6   |
+| 0007 | 天象事件求解           | 已完成 | C5、C6   |
 | 0008 | Delta-T 与闰秒数据模型 | 已完成 | C3       |
 
 ## 三、执行原则
@@ -73,7 +73,7 @@ const 对象替代 enum，与 isolatedModules 兼容。
 
 | 任务 | 大小 | 状态   | 前置条件                  | 输出                                                        |
 | ---- | ---- | ------ | ------------------------- | ----------------------------------------------------------- |
-| B3   | M    | 待开始 | C4、D1                    | RFC 0007 天象事件求解                                       |
+| B3   | M    | 已完成 | C4、D1                    | RFC 0007 天象事件求解                                       |
 | B4   | M    | 已完成 | 无                        | RFC 0008 Delta-T 与闰秒数据模型                             |
 | C1   | M    | 已完成 | RFC 0005                  | `@epheon/reference`                                         |
 | C2   | M    | 已完成 | RFC 0006、C1              | `@epheon/ephemerides`                                       |
@@ -102,6 +102,7 @@ D1：外部参考数据 bootstrap
 截至 `2026-06-17`，第二阶段新增完成：
 
 ```txt
+B3：RFC 0007 天象事件求解
 C1：@epheon/reference
 C2：@epheon/ephemerides
 C4：太阳黄经最小 provider
@@ -124,6 +125,22 @@ CI=true pnpm build
 文件：`docs/rfcs/0007-phenomena-events.md`
 
 说明：C4 和 D1 产出太阳黄经能力与验证数据后，再起草天象事件 RFC。这样可以用实测 fixture 反推可承诺的 tolerance，避免先写一个不落地的精度目标。
+
+当前状态：已完成（`2026-06-17`）
+
+已交付：
+
+```txt
+docs/rfcs/0007-phenomena-events.md
+```
+
+当前实现说明：
+
+```txt
+RFC 0007 当前锁定了节气与朔望的最小事件定义、输入输出时间模型、Delta-T / leap second 进入方式，以及默认二分法与可选 Newton refinement 策略。
+节气定义当前显式绑定太阳地心视黄经、ReferenceFrame.TrueOfDateEcliptic 与 Origin.Geocentric，和现有 D1 bootstrap fixture 保持一致。
+朔望部分当前只固定角度条件与月亮 provider 需求，不提前落 C6 代码。
+```
 
 验收标准：
 
