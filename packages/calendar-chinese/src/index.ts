@@ -1,8 +1,10 @@
 import {
   findLunarPhaseBetween,
   LunarPhaseKind,
+  SolarTermName,
   solarTermsOfYear,
-  type PhenomenaContext
+  type PhenomenaContext,
+  type SolarTermEvent
 } from "@epheon/phenomena";
 import { Body, ReferenceFrame } from "@epheon/reference";
 import { Instant } from "@epheon/temporal";
@@ -12,6 +14,21 @@ const DATE_QUERY_WINDOW_MILLISECONDS = 400 * DAY_IN_MILLISECONDS;
 const SEARCH_PADDING_MILLISECONDS = DATE_QUERY_WINDOW_MILLISECONDS;
 const NEW_MOON_WINDOW_MILLISECONDS = 32 * DAY_IN_MILLISECONDS;
 const NEW_MOON_SCAN_STEP_MILLISECONDS = 6 * 60 * 60 * 1000;
+const HEAVENLY_STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"] as const;
+const EARTHLY_BRANCHES = [
+  "子",
+  "丑",
+  "寅",
+  "卯",
+  "辰",
+  "巳",
+  "午",
+  "未",
+  "申",
+  "酉",
+  "戌",
+  "亥"
+] as const;
 
 /** 农历月序中的单个月段。 */
 export type ChineseLunarMonth = {
@@ -47,9 +64,43 @@ export type ChineseLunarDate = {
   readonly isLeapMonth: boolean;
 };
 
+/** 十天干字面量联合。 */
+export type HeavenlyStem = (typeof HEAVENLY_STEMS)[number];
+
+/** 十二地支字面量联合。 */
+export type EarthlyBranch = (typeof EARTHLY_BRANCHES)[number];
+
+/** 单个干支柱结果。 */
+export type GanzhiPillar = {
+  /** 天干。 */
+  readonly stem: HeavenlyStem;
+  /** 地支。 */
+  readonly branch: EarthlyBranch;
+  /** 干支组合名，例如“甲辰”。 */
+  readonly name: `${HeavenlyStem}${EarthlyBranch}`;
+};
+
+/** 给定时刻对应的最小干支结果。 */
+export type ChineseGanzhi = {
+  /** 按立春切换的纪年。 */
+  readonly year: GanzhiPillar;
+  /** 按十二节切换的纪月。 */
+  readonly month: GanzhiPillar;
+  /** 按本地民用日切换的纪日。 */
+  readonly day: GanzhiPillar;
+  /** 按本地时区的十二时辰切换的纪时。 */
+  readonly hour: GanzhiPillar;
+};
+
 type ResolvedChineseLunarMonth = ChineseLunarMonth & {
   readonly year: number;
   readonly month: number;
+};
+
+type ResolvedGanzhiPillar = {
+  readonly stemIndex: number;
+  readonly branchIndex: number;
+  readonly pillar: GanzhiPillar;
 };
 
 type PrincipalTermMarker = {
@@ -217,12 +268,54 @@ export function lunarDateOf(instant: Instant, context: PhenomenaContext): Chines
   };
 }
 
+/**
+ * 返回给定时刻对应的最小干支结果。
+ *
+ * 当前实现固定使用一个明确的 modern 规则切片：
+ * 1. 纪年按立春切换；
+ * 2. 纪月按十二节切换，立春起寅月；
+ * 3. 纪日按输入 offset 对应的本地民用日切换；
+ * 4. 纪时按本地时区的 23:00 子时起算。
+ *
+ * @param instant 要查询的时刻，必须带显式 offset。
+ * @param context 节气求解所需的最小上下文。
+ * @returns 对应时刻的纪年、纪月、纪日与纪时。
+ */
+export function ganzhiOf(instant: Instant, context: PhenomenaContext): ChineseGanzhi {
+  const offsetMinutes = instant.toUTCFields().offsetMinutes;
+  const localYear = toLocalYear(instant, offsetMinutes);
+  const solarTerms = collectSolarTermsForYears(localYear - 1, localYear + 1, context);
+  const year = resolveGanzhiYear(instant, solarTerms, offsetMinutes);
+  const day = resolveGanzhiDay(instant, offsetMinutes);
+
+  return {
+    year: year.pillar,
+    month: resolveGanzhiMonth(instant, solarTerms, year.stemIndex).pillar,
+    day: day.pillar,
+    hour: resolveGanzhiHour(instant, offsetMinutes, day.stemIndex).pillar
+  };
+}
+
 function assertStrictlyIncreasing(values: readonly number[], label: string): void {
   for (let index = 1; index < values.length; index += 1) {
     if (values[index]! <= values[index - 1]!) {
       throw new RangeError(`${label} must be strictly increasing.`);
     }
   }
+}
+
+function collectSolarTermsForYears(
+  startYear: number,
+  endYear: number,
+  context: PhenomenaContext
+): readonly SolarTermEvent[] {
+  const solarTerms: SolarTermEvent[] = [];
+
+  for (let year = startYear; year <= endYear; year += 1) {
+    solarTerms.push(...solarTermsOfYear(year, context));
+  }
+
+  return solarTerms;
 }
 
 function collectPrincipalTerms(
@@ -255,6 +348,134 @@ function collectPrincipalTerms(
   }
 
   return principalTerms;
+}
+
+function resolveGanzhiYear(
+  instant: Instant,
+  solarTerms: readonly SolarTermEvent[],
+  offsetMinutes: number
+): ResolvedGanzhiPillar {
+  const lichun = findLatestSolarTerm(
+    instant,
+    solarTerms,
+    (term) => term.name === SolarTermName.LiChun
+  );
+  const year = toLocalYear(lichun.instant, offsetMinutes);
+  const sexagenaryIndex = modulo(year - 4, 60);
+
+  return createResolvedGanzhiPillar(sexagenaryIndex % 10, sexagenaryIndex % 12);
+}
+
+function resolveGanzhiMonth(
+  instant: Instant,
+  solarTerms: readonly SolarTermEvent[],
+  yearStemIndex: number
+): ResolvedGanzhiPillar {
+  const boundary = findLatestSolarTerm(
+    instant,
+    solarTerms,
+    (term) => monthBoundaryOffsetOf(term) >= 0
+  );
+  const monthOffset = monthBoundaryOffsetOf(boundary);
+  const stemStartIndex = modulo((yearStemIndex % 5) * 2 + 2, 10);
+
+  return createResolvedGanzhiPillar(
+    modulo(stemStartIndex + monthOffset, 10),
+    modulo(2 + monthOffset, 12)
+  );
+}
+
+function resolveGanzhiDay(instant: Instant, offsetMinutes: number): ResolvedGanzhiPillar {
+  const localDate = toLocalDateFields(instant, offsetMinutes);
+  const julianDayNumber = gregorianToJulianDayNumber(
+    localDate.year,
+    localDate.month,
+    localDate.day
+  );
+  const sexagenaryIndex = modulo(julianDayNumber + 49, 60);
+
+  return createResolvedGanzhiPillar(sexagenaryIndex % 10, sexagenaryIndex % 12);
+}
+
+function resolveGanzhiHour(
+  instant: Instant,
+  offsetMinutes: number,
+  dayStemIndex: number
+): ResolvedGanzhiPillar {
+  const localDate = toLocalDateFields(instant, offsetMinutes);
+  const hourBranchIndex = modulo(Math.floor((localDate.hour + 1) / 2), 12);
+  const hourStemStartIndex = (dayStemIndex % 5) * 2;
+
+  return createResolvedGanzhiPillar(
+    modulo(hourStemStartIndex + hourBranchIndex, 10),
+    hourBranchIndex
+  );
+}
+
+function createResolvedGanzhiPillar(stemIndex: number, branchIndex: number): ResolvedGanzhiPillar {
+  const normalizedStemIndex = modulo(stemIndex, 10);
+  const normalizedBranchIndex = modulo(branchIndex, 12);
+  const stem = HEAVENLY_STEMS[normalizedStemIndex]!;
+  const branch = EARTHLY_BRANCHES[normalizedBranchIndex]!;
+
+  return {
+    stemIndex: normalizedStemIndex,
+    branchIndex: normalizedBranchIndex,
+    pillar: {
+      stem,
+      branch,
+      name: `${stem}${branch}`
+    }
+  };
+}
+
+function findLatestSolarTerm(
+  instant: Instant,
+  solarTerms: readonly SolarTermEvent[],
+  predicate: (term: SolarTermEvent) => boolean
+): SolarTermEvent {
+  const instantMilliseconds = toUtcMilliseconds(instant);
+
+  for (let index = solarTerms.length - 1; index >= 0; index -= 1) {
+    const term = solarTerms[index]!;
+
+    if (predicate(term) && toUtcMilliseconds(term.instant) <= instantMilliseconds) {
+      return term;
+    }
+  }
+
+  throw new RangeError("Unable to resolve the required solar-term boundary.");
+}
+
+function monthBoundaryOffsetOf(term: SolarTermEvent): number {
+  switch (term.name) {
+    case SolarTermName.LiChun:
+      return 0;
+    case SolarTermName.JingZhe:
+      return 1;
+    case SolarTermName.QingMing:
+      return 2;
+    case SolarTermName.LiXia:
+      return 3;
+    case SolarTermName.MangZhong:
+      return 4;
+    case SolarTermName.XiaoShu:
+      return 5;
+    case SolarTermName.LiQiu:
+      return 6;
+    case SolarTermName.BaiLu:
+      return 7;
+    case SolarTermName.HanLu:
+      return 8;
+    case SolarTermName.LiDong:
+      return 9;
+    case SolarTermName.DaXue:
+      return 10;
+    case SolarTermName.XiaoHan:
+      return 11;
+    default:
+      return -1;
+  }
 }
 
 function collectNewMoonStarts(
@@ -556,7 +777,46 @@ function toLocalDaySerial(instant: Instant, offsetMinutes: number): number {
 }
 
 function toLocalYear(instant: Instant, offsetMinutes: number): number {
-  return new Date(toUtcMilliseconds(instant) + offsetMinutes * 60_000).getUTCFullYear();
+  return toLocalDateFields(instant, offsetMinutes).year;
+}
+
+function toLocalDateFields(
+  instant: Instant,
+  offsetMinutes: number
+): {
+  readonly year: number;
+  readonly month: number;
+  readonly day: number;
+  readonly hour: number;
+} {
+  const localDate = new Date(toUtcMilliseconds(instant) + offsetMinutes * 60_000);
+
+  return {
+    year: localDate.getUTCFullYear(),
+    month: localDate.getUTCMonth() + 1,
+    day: localDate.getUTCDate(),
+    hour: localDate.getUTCHours()
+  };
+}
+
+function gregorianToJulianDayNumber(year: number, month: number, day: number): number {
+  const adjustment = Math.floor((14 - month) / 12);
+  const adjustedYear = year + 4800 - adjustment;
+  const adjustedMonth = month + 12 * adjustment - 3;
+
+  return (
+    day +
+    Math.floor((153 * adjustedMonth + 2) / 5) +
+    365 * adjustedYear +
+    Math.floor(adjustedYear / 4) -
+    Math.floor(adjustedYear / 100) +
+    Math.floor(adjustedYear / 400) -
+    32045
+  );
+}
+
+function modulo(value: number, divisor: number): number {
+  return ((value % divisor) + divisor) % divisor;
 }
 
 function lunarElongationDegrees(instant: Instant, context: PhenomenaContext): number {

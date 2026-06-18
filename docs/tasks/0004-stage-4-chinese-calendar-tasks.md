@@ -10,7 +10,7 @@
 | S4-T2 | 已完成 | 生成稳定的农历月表 API              | `packages/calendar-chinese/`             |
 | S4-T3 | 已完成 | 提供给定时刻查询农历日期的最小 API  | `packages/calendar-chinese/`             |
 | S4-T4 | 已完成 | 补月份编号、年界与日期映射规则      | `packages/calendar-chinese/`             |
-| S4-T5 | 待开始 | 增补干支能力                        | `packages/calendar-chinese/`             |
+| S4-T5 | 已完成 | 增补干支能力                        | `packages/calendar-chinese/`             |
 | S4-T6 | 暂缓   | 抽象 `@epheon/calendars` 统一历法层 | 未来新 package                           |
 
 ## S4-T1：实现农历月段构建与最小闰月判定切片
@@ -103,7 +103,7 @@
 
 ## S4-T5：增补干支能力
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -114,10 +114,25 @@
 - S4-T3
 - S4-T4
 
+当前产出：
+
+- `packages/calendar-chinese/src/index.ts`
+- `packages/calendar-chinese/tests/lunar-months.test.ts`
+- `packages/calendar-chinese/README.md`
+
 完成条件：
 
 - 至少明确一个稳定规则集下的干支结果。
 - 不把术数解释混入历法层。
+
+当前结果：
+
+- 提供 `ganzhiOf(...)`，返回纪年、纪月、纪日、纪时四柱。
+- 当前固定使用一个最小 `modern` 规则切片：
+  - 纪年按立春切换；
+  - 纪月按十二节切换，立春起寅月；
+  - 纪日按输入 offset 对应的本地民用日切换；
+  - 纪时按本地时区的 23:00 子时起算。
 
 ## S4-T6：抽象 `@epheon/calendars` 统一历法层
 
