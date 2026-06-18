@@ -10,7 +10,7 @@
 | S5-T2 | 已完成 | 为中国历法补 fixture             | `standards/calendar-chinese/` 或等价目录                 |
 | S5-T3 | 已完成 | 建立可运行的 conformance 入口    | `conformance/`                                           |
 | S5-T4 | 已完成 | 建立最小 benchmark 入口          | `benchmarks/`                                            |
-| S5-T5 | 进行中 | 明确数据来源、误差与更新规则文档 | `standards/README.md`、后续 conformance / benchmark 文档 |
+| S5-T5 | 已完成 | 明确数据来源、误差与更新规则文档 | `standards/README.md`、后续 conformance / benchmark 文档 |
 
 ## S5-T1：维护跨阶段标准样例目录
 
@@ -127,7 +127,7 @@
 
 ## S5-T5：明确数据来源、误差与更新规则文档
 
-状态：`进行中`
+状态：`已完成`
 
 目标：
 
@@ -135,10 +135,18 @@
 
 当前产出：
 
-- `standards/README.md`
-- dataset package 内的 dataset info 元信息
+- `standards/README.md`（数据来源与 tolerance 章节按三类领域补全）
+- `conformance/README.md`（补全数据来源链路与交叉引用）
+- `benchmarks/README.md`（补全交叉引用与数据集说明）
+- dataset package 内的 dataset info 元信息（`@epheon/dataset-delta-t`、`@epheon/dataset-leap-seconds`）
 
 完成条件：
 
 - 中国历法样例加入后，同步补全来源与 tolerance 说明。
 - conformance 与 benchmark 文档沿用同一套约定。
+
+当前结果：
+
+- `standards/README.md` 将 fixture 按三类领域（转换类/天象类/中国历法类）分别声明数据来源、参考依据与验证方式。
+- 中国历法样例明确为合成样例（VSOP87 + ELP2000 + ΔT + 闰秒），离散字段精确相等，底层天象精度由 JPL Horizons 校准。
+- conformance 与 benchmark 文档均通过交叉引用统一指向 `standards/README.md#数据来源`，形成单一事实来源。

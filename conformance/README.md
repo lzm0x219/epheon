@@ -42,10 +42,15 @@ pnpm conformance
 - 农历月表：精确比较 `year`、`month`、`isLeapMonth`
 - 农历日期：精确比较 `year`、`month`、`day`、`isLeapMonth`
 
-当前数据来源说明：
+> 完整的 fixture 数据来源、领域分类与 tolerance 约定参见 [`standards/README.md`](../standards/README.md#数据来源)。
 
-- 样例文件为 `standards/calendar-chinese/lunar.json`
-- 每条样例的 `basis` 字段说明该样例对应的规则集与边界场景
+当前数据来源链路：
+
+- 样例文件：`standards/calendar-chinese/lunar.json`
+- 样例由 VSOP87（太阳）+ ELP2000（月亮）+ 内置 ΔT + IERS 闰秒表，按 modern 规则集合成
+- 每条样例的 `basis` 字段说明该样例对应的规则集切片与边界场景
+- 天象输入的数值精度由 JPL Horizons 校准（参见 `standards/solar/terms.json` 的 `basis`）
+- 离散字段的精确相等建立在底层天象输入已在 tolerance 内收敛的前提上
 
 当前 `conformance/` 仍不纳入 pnpm workspace；先保持一个独立、可手动执行的最小入口。
 

@@ -33,6 +33,9 @@ pnpm bench
 
 ## 数据来源与误差说明
 
+benchmarks 本身只测量性能，不验证计算结果的正确性。基准中用到的计算组件的数据来源与 tolerance 约定，统一参见 [`standards/README.md`](../standards/README.md#数据来源)。
+
 - 节气与朔望计算使用 VSOP87（太阳）与 ELP2000（月亮）历表
-- Delta-T 使用内置 dataset
+- Delta-T 使用内置 dataset（参见 `@epheon/dataset-delta-t`）
+- 闰秒使用内置 IERS 阶跃表（参见 `@epheon/dataset-leap-seconds`）
 - 基准结果受运行环境（CPU、Node 版本）影响，应保留运行环境信息以便复现

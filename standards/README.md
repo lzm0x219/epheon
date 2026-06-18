@@ -282,9 +282,42 @@ standards/
 
 ### 数据来源
 
-- 转换类数值：通过已知公式（Meeus 算法、IAU 决议）计算得出，在测试中赋 tolerance
+fixture 按领域分为三类，各有不同的数据来源与验证链：
+
+#### 一、转换类数值（primitives、temporal、reference）
+
+通过已知公式（Meeus 算法、IAU 决议、IAU SOFA conventions）计算得出，在测试中赋 tolerance。
+
+| 领域                        | 参考来源                   | 验证方式       |
+| --------------------------- | -------------------------- | -------------- |
+| `primitives/`               | 数学恒等式、单位换算公式   | 显式 tolerance |
+| `temporal/julian-days.json` | Meeus、IAU SOFA            | 显式 tolerance |
+| `temporal/time-scales.json` | IERS Bulletin C、IAU 决议  | 显式 tolerance |
+| `reference/`                | IAU 决议、SOFA conventions | 显式 tolerance |
+
+#### 二、天象参考值（solar）
+
+二十四节气时刻与太阳视黄经对照 JPL Horizons API 生成。
+
+| 文件                    | 参考来源                                        | 验证方式                |
+| ----------------------- | ----------------------------------------------- | ----------------------- |
+| `solar/terms.json`      | JPL Horizons（quantity 31, ObsEcLon，逐时插值） | 建议 1s 级 tolerance    |
+| `solar/longitudes.json` | JPL Horizons（同上）                            | 建议 0.01° 级 tolerance |
+
+每条样例的 `basis` 字段记录具体查询参数与方法。
+
+#### 三、中国历法样例（calendar-chinese）
+
+中国历法样例是**合成样例**：将多个底层组件的计算结果固化为可复核的离散结果。
+
+| 文件                          | 底层输入来源                                                                             | 验证方式         |
+| ----------------------------- | ---------------------------------------------------------------------------------------- | ---------------- |
+| `calendar-chinese/lunar.json` | VSOP87（太阳视位置）+ ELP2000（月亮视位置）+ 内置 ΔT + IERS 闰秒表，按 modern 规则集生成 | 离散字段精确相等 |
+
+> 中国历法样例的 `basis` 字段记录该样例对应的规则集切片与边界场景（如"2023 闰二月窗口"、"2024 春节年界"）。离散字段（`year`、`month`、`day`、`isLeapMonth`）使用精确相等校验；底层的天象输入精度由上述天象类 tolerance 约束。
+
 - 非法输入：根据公共 API 校验规则构造
-- 外部校准来源：未来引入 JPL Horizons 等参考数据时，需在 `basis` 中记录查询参数和日期
+- 外部校准来源：JPL Horizons 等参考数据的具体查询参数和日期记录在各条 `basis` 中
 
 ## 使用方式
 
