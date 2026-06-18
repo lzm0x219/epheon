@@ -2,6 +2,7 @@
   "name": "epheon",
   "private": true,
   "scripts": {
+    "bench": "vitest bench --config benchmarks/vitest.config.ts",
     "build": "pnpm moon run :build",
     "conformance": "vitest run --config conformance/vitest.config.ts",
     "format": "oxfmt .",

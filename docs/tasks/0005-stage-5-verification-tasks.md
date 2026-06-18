@@ -9,7 +9,7 @@
 | S5-T1 | 已完成 | 维护跨阶段标准样例目录           | `standards/`                                             |
 | S5-T2 | 已完成 | 为中国历法补 fixture             | `standards/calendar-chinese/` 或等价目录                 |
 | S5-T3 | 已完成 | 建立可运行的 conformance 入口    | `conformance/`                                           |
-| S5-T4 | 待开始 | 建立最小 benchmark 入口          | `benchmarks/`                                            |
+| S5-T4 | 已完成 | 建立最小 benchmark 入口          | `benchmarks/`                                            |
 | S5-T5 | 进行中 | 明确数据来源、误差与更新规则文档 | `standards/README.md`、后续 conformance / benchmark 文档 |
 
 ## S5-T1：维护跨阶段标准样例目录
@@ -96,7 +96,7 @@
 
 ## S5-T4：建立最小 benchmark 入口
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -106,10 +106,24 @@
 
 - S4-T2
 
+当前产出：
+
+- `benchmarks/calendar-chinese.bench.ts`
+- `benchmarks/vitest.config.ts`
+- `benchmarks/README.md`
+- 根 `package.json` 中的 `pnpm bench` 入口
+
 完成条件：
 
 - 至少存在一个可重复运行的基准用例。
 - 不为早期 benchmark 引入复杂基础设施。
+
+当前结果：
+
+- 提供 `pnpm bench`，可独立运行性能基准。
+- 当前覆盖三个主路径：年度节气求解、年度朔望扫描、年度农历月表。
+- 每个路径覆盖 2023 / 2024 / 2025 三个典型年份。
+- 使用 `vitest bench`，无需额外工具链。
 
 ## S5-T5：明确数据来源、误差与更新规则文档
 
