@@ -98,6 +98,9 @@ importers:
       '@epheon/phenomena':
         specifier: workspace:*
         version: link:../phenomena
+      '@epheon/reference':
+        specifier: workspace:*
+        version: link:../reference
       '@epheon/temporal':
         specifier: workspace:*
         version: link:../temporal

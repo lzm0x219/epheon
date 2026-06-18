@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@epheon/phenomena": "workspace:*",
+    "@epheon/reference": "workspace:*",
     "@epheon/temporal": "workspace:*"
   },
   "devDependencies": {

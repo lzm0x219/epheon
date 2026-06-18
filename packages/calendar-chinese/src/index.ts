@@ -4,12 +4,14 @@ import {
   solarTermsOfYear,
   type PhenomenaContext
 } from "@epheon/phenomena";
+import { Body, ReferenceFrame } from "@epheon/reference";
 import { Instant } from "@epheon/temporal";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const SEARCH_PADDING_MILLISECONDS = 35 * DAY_IN_MILLISECONDS;
 const NEW_MOON_WINDOW_MILLISECONDS = 32 * DAY_IN_MILLISECONDS;
-const SEARCH_EPSILON_MILLISECONDS = 60 * 1000;
+const DATE_QUERY_WINDOW_MILLISECONDS = 400 * DAY_IN_MILLISECONDS;
+const NEW_MOON_SCAN_STEP_MILLISECONDS = 6 * 60 * 60 * 1000;
 
 /** 农历月序中的单个月段。 */
 export type ChineseLunarMonth = {
@@ -27,6 +29,28 @@ export type ChineseLunarMonth = {
 export type ChineseLunarMonthTableEntry = ChineseLunarMonth & {
   /** 返回结果内的顺序编号，从 1 开始。 */
   readonly sequence: number;
+};
+
+/** 给定时刻对应的最小农历日期结果。 */
+export type ChineseLunarDate = {
+  /** 农历年，当前最小实现按 modern 规则返回整数年份。 */
+  readonly year: number;
+  /** 农历月编号，范围为 1-12。 */
+  readonly month: number;
+  /** 农历日编号，范围为 1-30。 */
+  readonly day: number;
+  /** 当前月份是否为闰月。 */
+  readonly isLeapMonth: boolean;
+};
+
+type ResolvedChineseLunarMonth = ChineseLunarMonthTableEntry & {
+  readonly month: number;
+  readonly lunarYear: number;
+};
+
+type PrincipalTermMarker = {
+  readonly instant: Instant;
+  readonly isWinterSolstice: boolean;
 };
 
 /**
@@ -120,7 +144,7 @@ export function lunarMonthTableBetween(
     context
   );
 
-  return buildLunarMonthSequence(newMoonStarts, principalTerms)
+  return buildChineseLunarMonthTable(newMoonStarts, principalTerms)
     .filter((month) => overlapsWindow(month, startMilliseconds, endMilliseconds))
     .map((month, index) => ({
       ...month,
@@ -151,6 +175,50 @@ export function lunarMonthTableOfYear(
   );
 }
 
+/**
+ * 返回给定时刻对应的最小农历日期。
+ *
+ * 当前实现只支持一个最小 modern 规则切片：
+ * 1. 用包含冬至的月作为十一月锚点；
+ * 2. 基于闰月标记推导月编号；
+ * 3. 用输入 offset 解释农历日与农历年边界。
+ *
+ * @param instant 要查询的时刻，必须带显式 offset。
+ * @param context 节气与朔计算所需的最小上下文。
+ * @returns 对应时刻的农历年、月、日与闰月标记。
+ */
+export function lunarDateOf(instant: Instant, context: PhenomenaContext): ChineseLunarDate {
+  const instantMilliseconds = toUtcMilliseconds(instant);
+  const months = resolveChineseLunarMonths(
+    createInstantFromUtcMilliseconds(instantMilliseconds - DATE_QUERY_WINDOW_MILLISECONDS, context),
+    createInstantFromUtcMilliseconds(instantMilliseconds + DATE_QUERY_WINDOW_MILLISECONDS, context),
+    instant,
+    context
+  );
+  const currentMonth = months.find((month) => {
+    const startMilliseconds = toUtcMilliseconds(month.start);
+    const endMilliseconds = toUtcMilliseconds(month.end);
+
+    return instantMilliseconds >= startMilliseconds && instantMilliseconds < endMilliseconds;
+  });
+
+  if (currentMonth === undefined) {
+    throw new RangeError("Unable to resolve the lunar month for the requested instant.");
+  }
+
+  const offsetMinutes = instant.toUTCFields().offsetMinutes;
+
+  return {
+    year: currentMonth.lunarYear,
+    month: currentMonth.month,
+    day:
+      toLocalDaySerial(instant, offsetMinutes) -
+      toLocalDaySerial(currentMonth.start, offsetMinutes) +
+      1,
+    isLeapMonth: currentMonth.isLeapMonth
+  };
+}
+
 function assertStrictlyIncreasing(values: readonly number[], label: string): void {
   for (let index = 1; index < values.length; index += 1) {
     if (values[index]! <= values[index - 1]!) {
@@ -163,10 +231,10 @@ function collectPrincipalTerms(
   startMilliseconds: number,
   endMilliseconds: number,
   context: PhenomenaContext
-): readonly Instant[] {
+): readonly PrincipalTermMarker[] {
   const startYear = new Date(startMilliseconds).getUTCFullYear();
   const endYear = new Date(endMilliseconds).getUTCFullYear();
-  const principalTerms: Instant[] = [];
+  const principalTerms: PrincipalTermMarker[] = [];
 
   for (let year = startYear; year <= endYear; year += 1) {
     const terms = solarTermsOfYear(year, context);
@@ -176,11 +244,14 @@ function collectPrincipalTerms(
       const termMilliseconds = toUtcMilliseconds(term.instant);
 
       if (
-        targetLongitudeDegrees % 30 === 0 &&
+        isPrincipalTermLongitude(targetLongitudeDegrees) &&
         termMilliseconds >= startMilliseconds &&
         termMilliseconds < endMilliseconds
       ) {
-        principalTerms.push(term.instant);
+        principalTerms.push({
+          instant: term.instant,
+          isWinterSolstice: term.name === "冬至"
+        });
       }
     }
   }
@@ -194,23 +265,238 @@ function collectNewMoonStarts(
   context: PhenomenaContext
 ): readonly Instant[] {
   const newMoonStarts: Instant[] = [];
-  let cursorMilliseconds = startMilliseconds;
+  let leftMilliseconds = startMilliseconds - NEW_MOON_WINDOW_MILLISECONDS;
+  let leftInstant = createInstantFromUtcMilliseconds(leftMilliseconds, context);
+  let leftElongation = lunarElongationDegrees(leftInstant, context);
   const searchLimitMilliseconds = endMilliseconds + NEW_MOON_WINDOW_MILLISECONDS;
 
-  while (cursorMilliseconds < searchLimitMilliseconds) {
-    const newMoon = findLunarPhaseBetween(
-      LunarPhaseKind.NewMoon,
-      createInstantFromUtcMilliseconds(cursorMilliseconds, context),
-      createInstantFromUtcMilliseconds(cursorMilliseconds + NEW_MOON_WINDOW_MILLISECONDS, context),
-      context
-    );
-    const newMoonMilliseconds = toUtcMilliseconds(newMoon.instant);
+  for (
+    let rightMilliseconds = leftMilliseconds + NEW_MOON_SCAN_STEP_MILLISECONDS;
+    rightMilliseconds <= searchLimitMilliseconds;
+    rightMilliseconds += NEW_MOON_SCAN_STEP_MILLISECONDS
+  ) {
+    const rightInstant = createInstantFromUtcMilliseconds(rightMilliseconds, context);
+    const rightElongation = lunarElongationDegrees(rightInstant, context);
 
-    newMoonStarts.push(newMoon.instant);
-    cursorMilliseconds = newMoonMilliseconds + SEARCH_EPSILON_MILLISECONDS;
+    if (rightElongation < leftElongation) {
+      newMoonStarts.push(
+        findLunarPhaseBetween(LunarPhaseKind.NewMoon, leftInstant, rightInstant, context).instant
+      );
+    }
+
+    leftMilliseconds = rightMilliseconds;
+    leftInstant = rightInstant;
+    leftElongation = rightElongation;
   }
 
   return newMoonStarts;
+}
+
+function resolveChineseLunarMonths(
+  start: Instant,
+  end: Instant,
+  referenceInstant: Instant,
+  context: PhenomenaContext
+): readonly ResolvedChineseLunarMonth[] {
+  const months = lunarMonthTableBetween(start, end, context);
+  const numberedMonths = assignLunarMonthNumbers(months, context);
+  const monthOneIndices = numberedMonths.flatMap((month, index) =>
+    !month.isLeapMonth && month.month === 1 ? [index] : []
+  );
+
+  if (monthOneIndices.length === 0) {
+    throw new RangeError("Unable to resolve lunar year anchors from the generated month table.");
+  }
+
+  const offsetMinutes = referenceInstant.toUTCFields().offsetMinutes;
+  const firstMonthOneYear = toLocalYear(numberedMonths[monthOneIndices[0]!]!.start, offsetMinutes);
+  const resolved = numberedMonths.map((month) => ({
+    ...month,
+    lunarYear: firstMonthOneYear - 1
+  }));
+
+  for (let index = 0; index < monthOneIndices.length; index += 1) {
+    const segmentStart = monthOneIndices[index]!;
+    const segmentEnd = monthOneIndices[index + 1] ?? resolved.length;
+    const lunarYear = toLocalYear(resolved[segmentStart]!.start, offsetMinutes);
+
+    for (let monthIndex = segmentStart; monthIndex < segmentEnd; monthIndex += 1) {
+      resolved[monthIndex] = {
+        ...resolved[monthIndex]!,
+        lunarYear
+      };
+    }
+  }
+
+  return resolved;
+}
+
+function buildChineseLunarMonthTable(
+  newMoonStarts: readonly Instant[],
+  principalTerms: readonly PrincipalTermMarker[]
+): readonly ChineseLunarMonth[] {
+  const months = buildLunarMonthSequence(
+    newMoonStarts,
+    principalTerms.map((term) => term.instant)
+  );
+  const leapMonthFlags = Array(months.length).fill(false);
+  const winterSolsticeAnchors = principalTerms
+    .filter((term) => term.isWinterSolstice)
+    .map((term) =>
+      months.findIndex((month) => {
+        const monthStartMilliseconds = toUtcMilliseconds(month.start);
+        const monthEndMilliseconds = toUtcMilliseconds(month.end);
+        const termMilliseconds = toUtcMilliseconds(term.instant);
+
+        return (
+          termMilliseconds >= monthStartMilliseconds && termMilliseconds < monthEndMilliseconds
+        );
+      })
+    )
+    .filter((index) => index >= 0);
+
+  for (let index = 0; index < winterSolsticeAnchors.length - 1; index += 1) {
+    const anchor = winterSolsticeAnchors[index]!;
+    const nextAnchor = winterSolsticeAnchors[index + 1]!;
+
+    if (nextAnchor - anchor !== 13) {
+      continue;
+    }
+
+    const leapMonthIndex = months.findIndex(
+      (month, monthIndex) =>
+        monthIndex >= anchor && monthIndex < nextAnchor && !month.containsPrincipalTerm
+    );
+
+    if (leapMonthIndex >= 0) {
+      leapMonthFlags[leapMonthIndex] = true;
+    }
+  }
+
+  return months.map((month, index) => ({
+    ...month,
+    isLeapMonth: leapMonthFlags[index]!
+  }));
+}
+
+function assignLunarMonthNumbers(
+  months: readonly ChineseLunarMonthTableEntry[],
+  context: PhenomenaContext
+): readonly Omit<ResolvedChineseLunarMonth, "lunarYear">[] {
+  const monthNumbers = Array<number>(months.length).fill(0);
+  const winterSolsticeAnchors = collectWinterSolsticeAnchors(months, context);
+
+  if (winterSolsticeAnchors.length === 0) {
+    throw new RangeError("Unable to locate a winter-solstice anchor for lunar month numbering.");
+  }
+
+  for (const anchorIndex of winterSolsticeAnchors) {
+    monthNumbers[anchorIndex] = 11;
+  }
+
+  fillMonthNumbersBackward(months, monthNumbers, winterSolsticeAnchors[0]!);
+
+  for (let index = 0; index < winterSolsticeAnchors.length - 1; index += 1) {
+    fillMonthNumbersForward(
+      months,
+      monthNumbers,
+      winterSolsticeAnchors[index]!,
+      winterSolsticeAnchors[index + 1]!
+    );
+  }
+
+  fillMonthNumbersForward(
+    months,
+    monthNumbers,
+    winterSolsticeAnchors[winterSolsticeAnchors.length - 1]!,
+    months.length
+  );
+
+  return months.map((month, index) => ({
+    ...month,
+    month: monthNumbers[index]!
+  }));
+}
+
+function collectWinterSolsticeAnchors(
+  months: readonly ChineseLunarMonthTableEntry[],
+  context: PhenomenaContext
+): readonly number[] {
+  const firstMonth = months[0];
+  const lastMonth = months[months.length - 1];
+
+  if (firstMonth === undefined || lastMonth === undefined) {
+    return [];
+  }
+
+  const startMilliseconds = toUtcMilliseconds(firstMonth.start);
+  const endMilliseconds = toUtcMilliseconds(lastMonth.end);
+  const startYear = new Date(startMilliseconds).getUTCFullYear();
+  const endYear = new Date(endMilliseconds).getUTCFullYear();
+  const anchors = new Set<number>();
+
+  for (let year = startYear; year <= endYear; year += 1) {
+    const winterSolstice = solarTermsOfYear(year, context).find((term) => term.name === "冬至");
+
+    if (winterSolstice === undefined) {
+      continue;
+    }
+
+    const anchorIndex = months.findIndex((month) => {
+      const monthStartMilliseconds = toUtcMilliseconds(month.start);
+      const monthEndMilliseconds = toUtcMilliseconds(month.end);
+      const solsticeMilliseconds = toUtcMilliseconds(winterSolstice.instant);
+
+      return (
+        solsticeMilliseconds >= monthStartMilliseconds &&
+        solsticeMilliseconds < monthEndMilliseconds
+      );
+    });
+
+    if (anchorIndex >= 0) {
+      anchors.add(anchorIndex);
+    }
+  }
+
+  return Array.from(anchors).sort((left, right) => left - right);
+}
+
+function fillMonthNumbersForward(
+  months: readonly ChineseLunarMonthTableEntry[],
+  monthNumbers: number[],
+  startIndex: number,
+  endExclusive: number
+): void {
+  for (let index = startIndex + 1; index < endExclusive; index += 1) {
+    const previousMonthNumber = monthNumbers[index - 1]!;
+
+    monthNumbers[index] = months[index]!.isLeapMonth
+      ? previousMonthNumber
+      : nextMonthNumber(previousMonthNumber);
+  }
+}
+
+function fillMonthNumbersBackward(
+  months: readonly ChineseLunarMonthTableEntry[],
+  monthNumbers: number[],
+  anchorIndex: number
+): void {
+  for (let index = anchorIndex - 1; index >= 0; index -= 1) {
+    const nextMonth = months[index + 1]!;
+    const nextMonthNumber = monthNumbers[index + 1]!;
+
+    monthNumbers[index] = nextMonth.isLeapMonth
+      ? nextMonthNumber
+      : previousMonthNumber(nextMonthNumber);
+  }
+}
+
+function nextMonthNumber(monthNumber: number): number {
+  return monthNumber === 12 ? 1 : monthNumber + 1;
+}
+
+function previousMonthNumber(monthNumber: number): number {
+  return monthNumber === 1 ? 12 : monthNumber - 1;
 }
 
 function overlapsWindow(
@@ -251,4 +537,37 @@ function toUtcMilliseconds(instant: Instant): number {
     ) -
     fields.offsetMinutes * 60_000
   );
+}
+
+function toLocalDaySerial(instant: Instant, offsetMinutes: number): number {
+  return Math.floor((toUtcMilliseconds(instant) + offsetMinutes * 60_000) / DAY_IN_MILLISECONDS);
+}
+
+function toLocalYear(instant: Instant, offsetMinutes: number): number {
+  return new Date(toUtcMilliseconds(instant) + offsetMinutes * 60_000).getUTCFullYear();
+}
+
+function lunarElongationDegrees(instant: Instant, context: PhenomenaContext): number {
+  const moonLongitudeDegrees = context.ephemeris
+    .position(Body.Moon, instant, {
+      frame: ReferenceFrame.TrueOfDateEcliptic
+    })
+    .coordinates.longitude.toDegrees();
+  const sunLongitudeDegrees = context.ephemeris
+    .position(Body.Sun, instant, {
+      frame: ReferenceFrame.TrueOfDateEcliptic
+    })
+    .coordinates.longitude.toDegrees();
+
+  return normalizeDegrees(moonLongitudeDegrees - sunLongitudeDegrees);
+}
+
+function normalizeDegrees(degrees: number): number {
+  return ((degrees % 360) + 360) % 360;
+}
+
+function isPrincipalTermLongitude(longitudeDegrees: number): boolean {
+  const remainder = normalizeDegrees(longitudeDegrees) % 30;
+
+  return remainder < 1e-9 || 30 - remainder < 1e-9;
 }

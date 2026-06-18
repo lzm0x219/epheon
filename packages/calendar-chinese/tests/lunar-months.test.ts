@@ -6,7 +6,12 @@ import { createVSOP87SunProvider } from "../../ephemerides-vsop87/src";
 import { type EphemerisOptions } from "../../ephemerides/src";
 import { Body, type Position } from "../../reference/src";
 import { Instant } from "../../temporal/src";
-import { buildLunarMonthSequence, lunarMonthTableBetween, lunarMonthTableOfYear } from "../src";
+import {
+  buildLunarMonthSequence,
+  lunarDateOf,
+  lunarMonthTableBetween,
+  lunarMonthTableOfYear
+} from "../src";
 
 const leapSeconds = createLeapSecondProvider();
 const deltaT = createDeltaTProvider();
@@ -94,6 +99,39 @@ describe("@epheon/calendar-chinese", () => {
 
   it("rejects a non-integer UTC year", () => {
     expect(() => lunarMonthTableOfYear(2024.5, context)).toThrow(RangeError);
+  });
+
+  it("returns lunar new year day for the 2024 spring festival sample", () => {
+    const lunarDate = lunarDateOf(createInstant("2024-02-10T12:00:00+08:00"), context);
+
+    expect(lunarDate).toEqual({
+      year: 2024,
+      month: 1,
+      day: 1,
+      isLeapMonth: false
+    });
+  });
+
+  it("keeps the previous lunar year before the 2024 spring festival boundary", () => {
+    const lunarDate = lunarDateOf(createInstant("2024-02-09T12:00:00+08:00"), context);
+
+    expect(lunarDate).toEqual({
+      year: 2023,
+      month: 12,
+      day: 30,
+      isLeapMonth: false
+    });
+  });
+
+  it("marks the 2023 leap second month sample as a leap month", () => {
+    const lunarDate = lunarDateOf(createInstant("2023-03-22T12:00:00+08:00"), context);
+
+    expect(lunarDate).toEqual({
+      year: 2023,
+      month: 2,
+      day: 1,
+      isLeapMonth: true
+    });
   });
 });
 
