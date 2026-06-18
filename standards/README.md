@@ -27,6 +27,8 @@ standards/
 ├── reference/            # 坐标与参考系参考数值
 │   ├── coordinates.json  # 球面坐标与内部笛卡尔转换样例
 │   └── frames.json       # ReferenceFrame 预设帧样例
+├── calendar-chinese/     # 中国历法参考样例
+│   └── lunar.json        # 农历月表与已知历日样例
 ├── solar/                # 太阳黄经与二十四节气参考数值
 │   ├── longitudes.json   # 太阳视黄经样例
 │   └── terms.json        # 二十四节气时刻样例
@@ -55,6 +57,7 @@ standards/
 | `primitives/vectors.json`          | `vectors[]`、`operations[]`        | 向量数值与运算结果    |
 | `reference/coordinates.json`       | `coordinates[]`                    | 球面坐标与笛卡尔转换  |
 | `reference/frames.json`            | `frames[]`                         | 预设参考系定义        |
+| `calendar-chinese/lunar.json`      | `monthTables[]`、`lunarDates[]`    | 农历月表与历日样例    |
 | `solar/longitudes.json`            | `solarLongitudes[]`                | 太阳视黄经参考样例    |
 | `solar/terms.json`                 | `solarTerms[]`                     | 二十四节气时刻样例    |
 | `temporal/julian-days.json`        | `utcInstants[]`                    | UTC 与 JD 映射        |
@@ -161,6 +164,39 @@ standards/
 | `name`             | string           | 预设帧稳定名称                      |
 | `coordinateSystem` | string           | 对应坐标系统                        |
 | `epochJde`         | `number \| null` | 固定历元的 JDE；瞬时历元帧为 `null` |
+
+### `calendar-chinese/lunar.json`
+
+根结构：`{ monthTables: LunarMonthTableSample[]; lunarDates: LunarDateSample[] }`
+
+`monthTables[]`
+
+| 字段             | 类型     | 说明                           |
+| ---------------- | -------- | ------------------------------ |
+| `id`             | string   | 样例稳定标识                   |
+| `start`          | string   | 查询窗口起点，带显式时区偏移   |
+| `end`            | string   | 查询窗口终点，带显式时区偏移   |
+| `expectedMonths` | object[] | 该窗口内预期的农历月表结果     |
+| `basis`          | string   | 样例来源、规则集或边界场景说明 |
+
+`monthTables[].expectedMonths[]`
+
+| 字段          | 类型    | 说明             |
+| ------------- | ------- | ---------------- |
+| `year`        | number  | 农历年           |
+| `month`       | number  | 农历月编号       |
+| `isLeapMonth` | boolean | 当前月份是否闰月 |
+
+`lunarDates[]`
+
+| 字段          | 类型    | 说明                           |
+| ------------- | ------- | ------------------------------ |
+| `input`       | string  | 查询时刻，带显式时区偏移       |
+| `year`        | number  | 预期农历年                     |
+| `month`       | number  | 预期农历月编号                 |
+| `day`         | number  | 预期农历日编号                 |
+| `isLeapMonth` | boolean | 预期当前月份是否闰月           |
+| `basis`       | string  | 样例来源、规则集或边界场景说明 |
 
 ### `temporal/julian-days.json`
 

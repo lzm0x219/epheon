@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import calendarChineseStandards from "../../../standards/calendar-chinese/lunar.json";
 import { createDeltaTProvider } from "../../dataset-delta-t/src";
 import { createLeapSecondProvider } from "../../dataset-leap-seconds/src";
 import { createELP2000MoonProvider } from "../../ephemerides-elp2000/src";
@@ -92,46 +93,22 @@ describe("@epheon/calendar-chinese", () => {
     }
   });
 
-  it("includes lunar year and month numbering across the 2024 new-year boundary", () => {
-    const months = lunarMonthTableBetween(
-      createInstant("2024-01-01T00:00:00+08:00"),
-      createInstant("2024-04-01T00:00:00+08:00"),
-      context
-    );
+  it("matches bootstrap month-table standards for year and leap-month windows", () => {
+    for (const sample of calendarChineseStandards.monthTables) {
+      const months = lunarMonthTableBetween(
+        createInstant(sample.start),
+        createInstant(sample.end),
+        context
+      );
 
-    expect(
-      months.map((month) => ({
-        year: month.year,
-        month: month.month,
-        isLeapMonth: month.isLeapMonth
-      }))
-    ).toEqual([
-      { year: 2023, month: 11, isLeapMonth: false },
-      { year: 2023, month: 12, isLeapMonth: false },
-      { year: 2024, month: 1, isLeapMonth: false },
-      { year: 2024, month: 2, isLeapMonth: false }
-    ]);
-  });
-
-  it("keeps leap-month numbering on the month table for the 2023 leap second month", () => {
-    const months = lunarMonthTableBetween(
-      createInstant("2023-02-01T00:00:00+08:00"),
-      createInstant("2023-05-01T00:00:00+08:00"),
-      context
-    );
-
-    expect(
-      months.map((month) => ({
-        year: month.year,
-        month: month.month,
-        isLeapMonth: month.isLeapMonth
-      }))
-    ).toEqual([
-      { year: 2023, month: 1, isLeapMonth: false },
-      { year: 2023, month: 2, isLeapMonth: false },
-      { year: 2023, month: 2, isLeapMonth: true },
-      { year: 2023, month: 3, isLeapMonth: false }
-    ]);
+      expect(
+        months.map((month) => ({
+          year: month.year,
+          month: month.month,
+          isLeapMonth: month.isLeapMonth
+        }))
+      ).toEqual(sample.expectedMonths);
+    }
   });
 
   it("rejects an inverted month-table window", () => {
@@ -144,37 +121,15 @@ describe("@epheon/calendar-chinese", () => {
     expect(() => lunarMonthTableOfYear(2024.5, context)).toThrow(RangeError);
   });
 
-  it("returns lunar new year day for the 2024 spring festival sample", () => {
-    const lunarDate = lunarDateOf(createInstant("2024-02-10T12:00:00+08:00"), context);
-
-    expect(lunarDate).toEqual({
-      year: 2024,
-      month: 1,
-      day: 1,
-      isLeapMonth: false
-    });
-  });
-
-  it("keeps the previous lunar year before the 2024 spring festival boundary", () => {
-    const lunarDate = lunarDateOf(createInstant("2024-02-09T12:00:00+08:00"), context);
-
-    expect(lunarDate).toEqual({
-      year: 2023,
-      month: 12,
-      day: 30,
-      isLeapMonth: false
-    });
-  });
-
-  it("marks the 2023 leap second month sample as a leap month", () => {
-    const lunarDate = lunarDateOf(createInstant("2023-03-22T12:00:00+08:00"), context);
-
-    expect(lunarDate).toEqual({
-      year: 2023,
-      month: 2,
-      day: 1,
-      isLeapMonth: true
-    });
+  it("matches bootstrap lunar-date standards for year and month boundaries", () => {
+    for (const sample of calendarChineseStandards.lunarDates) {
+      expect(lunarDateOf(createInstant(sample.input), context)).toEqual({
+        year: sample.year,
+        month: sample.month,
+        day: sample.day,
+        isLeapMonth: sample.isLeapMonth
+      });
+    }
   });
 
   it("returns the four pillars for the 2024 spring festival sample", () => {
