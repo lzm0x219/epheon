@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-banner.svg" alt="Epheon banner" width="100%" />
+  <img src="assets/readme-banner.svg" alt="Epheon banner" width="100%" />
 </p>
 
 <h1 align="center">Epheon</h1>
