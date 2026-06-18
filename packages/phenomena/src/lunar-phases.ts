@@ -96,7 +96,7 @@ function findLunarPhaseInstant(
     );
 
     if (isBracket(leftDifference, rightDifference)) {
-      return bisectLunarPhase(
+      const instant = bisectLunarPhase(
         targetLongitudeDifferenceDegrees,
         leftMilliseconds,
         rightMilliseconds,
@@ -104,6 +104,11 @@ function findLunarPhaseInstant(
         rightDifference,
         context
       );
+
+      // 收敛后验证实际日月黄经差是否接近目标值，过滤跨 180° 边界的误判。
+      if (isPhaseNearTarget(instant, targetLongitudeDifferenceDegrees, context)) {
+        return instant;
+      }
     }
 
     leftMilliseconds = rightMilliseconds;
@@ -185,6 +190,32 @@ function targetLongitudeDifferenceDegreesOf(kind: LunarPhaseKind): number {
 
 function isBracket(left: number, right: number): boolean {
   return left === 0 || right === 0 || (left < 0 && right > 0) || (left > 0 && right < 0);
+}
+
+/**
+ * 验证收敛后的日月黄经差是否接近目标值，过滤因跨 ±180° 边界产生的误判。
+ *
+ * 误判场景：搜索全月（target=180°）时，新月（moonLon≈sunLon）处的事件函数值会
+ * 从 179° 跳变到 -179°，isBracket 检测到变号，但实际黄经差为 0° 而非 180°。
+ *
+ * 当前使用 10° 阈值：对于 6 小时步进算法，正确的包围区间两端不会差太远。
+ */
+function isPhaseNearTarget(
+  instant: Instant,
+  targetLongitudeDifferenceDegrees: number,
+  context: PhenomenaContext
+): boolean {
+  const moonLon = context.ephemeris
+    .position(Body.Moon, instant, { frame: ReferenceFrame.TrueOfDateEcliptic })
+    .coordinates.longitude.normalizeDegrees()
+    .toDegrees();
+  const sunLon = context.ephemeris
+    .position(Body.Sun, instant, { frame: ReferenceFrame.TrueOfDateEcliptic })
+    .coordinates.longitude.normalizeDegrees()
+    .toDegrees();
+  const rawDifference = normalizeSignedDegrees(moonLon - sunLon - targetLongitudeDifferenceDegrees);
+
+  return Math.abs(rawDifference) < 10;
 }
 
 function createInstantFromUtcMilliseconds(
