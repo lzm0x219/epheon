@@ -91,6 +91,48 @@ describe("@epheon/calendar-chinese", () => {
     }
   });
 
+  it("includes lunar year and month numbering across the 2024 new-year boundary", () => {
+    const months = lunarMonthTableBetween(
+      createInstant("2024-01-01T00:00:00+08:00"),
+      createInstant("2024-04-01T00:00:00+08:00"),
+      context
+    );
+
+    expect(
+      months.map((month) => ({
+        year: month.year,
+        month: month.month,
+        isLeapMonth: month.isLeapMonth
+      }))
+    ).toEqual([
+      { year: 2023, month: 11, isLeapMonth: false },
+      { year: 2023, month: 12, isLeapMonth: false },
+      { year: 2024, month: 1, isLeapMonth: false },
+      { year: 2024, month: 2, isLeapMonth: false }
+    ]);
+  });
+
+  it("keeps leap-month numbering on the month table for the 2023 leap second month", () => {
+    const months = lunarMonthTableBetween(
+      createInstant("2023-02-01T00:00:00+08:00"),
+      createInstant("2023-05-01T00:00:00+08:00"),
+      context
+    );
+
+    expect(
+      months.map((month) => ({
+        year: month.year,
+        month: month.month,
+        isLeapMonth: month.isLeapMonth
+      }))
+    ).toEqual([
+      { year: 2023, month: 1, isLeapMonth: false },
+      { year: 2023, month: 2, isLeapMonth: false },
+      { year: 2023, month: 2, isLeapMonth: true },
+      { year: 2023, month: 3, isLeapMonth: false }
+    ]);
+  });
+
   it("rejects an inverted month-table window", () => {
     const instant = createInstant("2024-02-01T00:00:00Z");
 

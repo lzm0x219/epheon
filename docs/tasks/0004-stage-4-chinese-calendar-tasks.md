@@ -9,7 +9,7 @@
 | S4-T1 | 已完成 | 实现农历月段构建与最小闰月判定切片  | `packages/calendar-chinese/src/index.ts` |
 | S4-T2 | 已完成 | 生成稳定的农历月表 API              | `packages/calendar-chinese/`             |
 | S4-T3 | 已完成 | 提供给定时刻查询农历日期的最小 API  | `packages/calendar-chinese/`             |
-| S4-T4 | 待开始 | 补月份编号、年界与日期映射规则      | `packages/calendar-chinese/`             |
+| S4-T4 | 已完成 | 补月份编号、年界与日期映射规则      | `packages/calendar-chinese/`             |
 | S4-T5 | 待开始 | 增补干支能力                        | `packages/calendar-chinese/`             |
 | S4-T6 | 暂缓   | 抽象 `@epheon/calendars` 统一历法层 | 未来新 package                           |
 
@@ -81,7 +81,7 @@
 
 ## S4-T4：补月份编号、年界与日期映射规则
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -90,6 +90,11 @@
 依赖：
 
 - S4-T2
+
+当前产出：
+
+- `packages/calendar-chinese/src/index.ts`
+- `packages/calendar-chinese/tests/lunar-months.test.ts`
 
 完成条件：
 

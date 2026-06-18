@@ -8,9 +8,9 @@ import { Body, ReferenceFrame } from "@epheon/reference";
 import { Instant } from "@epheon/temporal";
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
-const SEARCH_PADDING_MILLISECONDS = 35 * DAY_IN_MILLISECONDS;
-const NEW_MOON_WINDOW_MILLISECONDS = 32 * DAY_IN_MILLISECONDS;
 const DATE_QUERY_WINDOW_MILLISECONDS = 400 * DAY_IN_MILLISECONDS;
+const SEARCH_PADDING_MILLISECONDS = DATE_QUERY_WINDOW_MILLISECONDS;
+const NEW_MOON_WINDOW_MILLISECONDS = 32 * DAY_IN_MILLISECONDS;
 const NEW_MOON_SCAN_STEP_MILLISECONDS = 6 * 60 * 60 * 1000;
 
 /** 农历月序中的单个月段。 */
@@ -27,6 +27,10 @@ export type ChineseLunarMonth = {
 
 /** 可直接消费的农历月表条目。 */
 export type ChineseLunarMonthTableEntry = ChineseLunarMonth & {
+  /** 该月对应的农历年。 */
+  readonly year: number;
+  /** 该月对应的农历月编号。 */
+  readonly month: number;
   /** 返回结果内的顺序编号，从 1 开始。 */
   readonly sequence: number;
 };
@@ -43,9 +47,9 @@ export type ChineseLunarDate = {
   readonly isLeapMonth: boolean;
 };
 
-type ResolvedChineseLunarMonth = ChineseLunarMonthTableEntry & {
+type ResolvedChineseLunarMonth = ChineseLunarMonth & {
+  readonly year: number;
   readonly month: number;
-  readonly lunarYear: number;
 };
 
 type PrincipalTermMarker = {
@@ -110,8 +114,8 @@ export function buildLunarMonthSequence(
  *
  * 当前实现只收口到“稳定月表”：
  * 1. 自动拼接朔与中气输入；
- * 2. 返回顺序编号、闰月标记与起止边界；
- * 3. 暂不补月份编号与农历日期映射。
+ * 2. 返回农历年、月编号、闰月标记与起止边界；
+ * 3. 年月语义按查询窗口起点的显式 offset 解释。
  *
  * @param start 查询窗口起点，按 UTC 时刻比较。
  * @param end 查询窗口终点，必须晚于 start。
@@ -133,18 +137,12 @@ export function lunarMonthTableBetween(
 
   const expandedStartMilliseconds = startMilliseconds - SEARCH_PADDING_MILLISECONDS;
   const expandedEndMilliseconds = endMilliseconds + SEARCH_PADDING_MILLISECONDS;
-  const principalTerms = collectPrincipalTerms(
+  return buildResolvedChineseLunarMonths(
     expandedStartMilliseconds,
     expandedEndMilliseconds,
+    start,
     context
-  );
-  const newMoonStarts = collectNewMoonStarts(
-    expandedStartMilliseconds,
-    expandedEndMilliseconds,
-    context
-  );
-
-  return buildChineseLunarMonthTable(newMoonStarts, principalTerms)
+  )
     .filter((month) => overlapsWindow(month, startMilliseconds, endMilliseconds))
     .map((month, index) => ({
       ...month,
@@ -189,9 +187,9 @@ export function lunarMonthTableOfYear(
  */
 export function lunarDateOf(instant: Instant, context: PhenomenaContext): ChineseLunarDate {
   const instantMilliseconds = toUtcMilliseconds(instant);
-  const months = resolveChineseLunarMonths(
-    createInstantFromUtcMilliseconds(instantMilliseconds - DATE_QUERY_WINDOW_MILLISECONDS, context),
-    createInstantFromUtcMilliseconds(instantMilliseconds + DATE_QUERY_WINDOW_MILLISECONDS, context),
+  const months = buildResolvedChineseLunarMonths(
+    instantMilliseconds - DATE_QUERY_WINDOW_MILLISECONDS,
+    instantMilliseconds + DATE_QUERY_WINDOW_MILLISECONDS,
     instant,
     context
   );
@@ -209,7 +207,7 @@ export function lunarDateOf(instant: Instant, context: PhenomenaContext): Chines
   const offsetMinutes = instant.toUTCFields().offsetMinutes;
 
   return {
-    year: currentMonth.lunarYear,
+    year: currentMonth.year,
     month: currentMonth.month,
     day:
       toLocalDaySerial(instant, offsetMinutes) -
@@ -292,13 +290,27 @@ function collectNewMoonStarts(
   return newMoonStarts;
 }
 
-function resolveChineseLunarMonths(
-  start: Instant,
-  end: Instant,
+function buildResolvedChineseLunarMonths(
+  startMilliseconds: number,
+  endMilliseconds: number,
   referenceInstant: Instant,
   context: PhenomenaContext
 ): readonly ResolvedChineseLunarMonth[] {
-  const months = lunarMonthTableBetween(start, end, context);
+  const principalTerms = collectPrincipalTerms(startMilliseconds, endMilliseconds, context);
+  const newMoonStarts = collectNewMoonStarts(startMilliseconds, endMilliseconds, context);
+
+  return resolveChineseLunarMonths(
+    buildChineseLunarMonthTable(newMoonStarts, principalTerms),
+    referenceInstant,
+    context
+  );
+}
+
+function resolveChineseLunarMonths(
+  months: readonly ChineseLunarMonth[],
+  referenceInstant: Instant,
+  context: PhenomenaContext
+): readonly ResolvedChineseLunarMonth[] {
   const numberedMonths = assignLunarMonthNumbers(months, context);
   const monthOneIndices = numberedMonths.flatMap((month, index) =>
     !month.isLeapMonth && month.month === 1 ? [index] : []
@@ -312,7 +324,7 @@ function resolveChineseLunarMonths(
   const firstMonthOneYear = toLocalYear(numberedMonths[monthOneIndices[0]!]!.start, offsetMinutes);
   const resolved = numberedMonths.map((month) => ({
     ...month,
-    lunarYear: firstMonthOneYear - 1
+    year: firstMonthOneYear - 1
   }));
 
   for (let index = 0; index < monthOneIndices.length; index += 1) {
@@ -323,7 +335,7 @@ function resolveChineseLunarMonths(
     for (let monthIndex = segmentStart; monthIndex < segmentEnd; monthIndex += 1) {
       resolved[monthIndex] = {
         ...resolved[monthIndex]!,
-        lunarYear
+        year: lunarYear
       };
     }
   }
@@ -380,9 +392,9 @@ function buildChineseLunarMonthTable(
 }
 
 function assignLunarMonthNumbers(
-  months: readonly ChineseLunarMonthTableEntry[],
+  months: readonly ChineseLunarMonth[],
   context: PhenomenaContext
-): readonly Omit<ResolvedChineseLunarMonth, "lunarYear">[] {
+): readonly Omit<ResolvedChineseLunarMonth, "year">[] {
   const monthNumbers = Array<number>(months.length).fill(0);
   const winterSolsticeAnchors = collectWinterSolsticeAnchors(months, context);
 
@@ -419,7 +431,7 @@ function assignLunarMonthNumbers(
 }
 
 function collectWinterSolsticeAnchors(
-  months: readonly ChineseLunarMonthTableEntry[],
+  months: readonly ChineseLunarMonth[],
   context: PhenomenaContext
 ): readonly number[] {
   const firstMonth = months[0];
@@ -462,7 +474,7 @@ function collectWinterSolsticeAnchors(
 }
 
 function fillMonthNumbersForward(
-  months: readonly ChineseLunarMonthTableEntry[],
+  months: readonly ChineseLunarMonth[],
   monthNumbers: number[],
   startIndex: number,
   endExclusive: number
@@ -477,7 +489,7 @@ function fillMonthNumbersForward(
 }
 
 function fillMonthNumbersBackward(
-  months: readonly ChineseLunarMonthTableEntry[],
+  months: readonly ChineseLunarMonth[],
   monthNumbers: number[],
   anchorIndex: number
 ): void {
