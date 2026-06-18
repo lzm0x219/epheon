@@ -725,10 +725,11 @@ packages/temporal/moon.yml
 
 当前项目已经进入第一阶段实现期，工程骨架可以支持继续扩展核心领域能力。
 
-后续任务拆分、验收标准和推荐执行顺序由计划文档维护：
+后续任务拆分、验收标准和推荐执行顺序由计划与任务文档共同维护：
 
 ```txt
-docs/plans/0001-first-stage-task-breakdown.md
+docs/plans/0001-stage-1-time-model.md
+docs/tasks/0001-stage-1-time-model-tasks.md
 ```
 
 如果后续任务改变包管理器、构建工具、测试框架、发布策略、运行时支持矩阵或核心包边界，应先更新本文或新增 RFC，再落到计划与实现中。
