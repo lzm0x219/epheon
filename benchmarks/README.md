@@ -12,17 +12,29 @@ benchmarks 只测量性能变化趋势，不作为正确性依据（正确性由
 pnpm bench
 ```
 
-当前 runner 基于 `vitest bench`，执行 `benchmarks/calendar-chinese.bench.ts`。
+当前 runner 基于 `vitest bench`，执行：
+
+- `benchmarks/primitives-temporal.bench.ts`（基础类型与时间模型）
+- `benchmarks/calendar-chinese.bench.ts`（天象与历法）
 
 ## 当前基准范围
 
-| 基准项       | 说明                    |
-| ------------ | ----------------------- |
-| 年度节气求解 | `solarTermsOfYear`      |
-| 年度朔望扫描 | 年内所有朔时刻扫描      |
-| 年度农历月表 | `lunarMonthTableOfYear` |
+### 基础类型与时间模型
 
-每个基准项覆盖 2023 / 2024 / 2025 三个年份，用于观察典型计算负载。
+| 文件                           | 基准项    | 说明                            |
+| ------------------------------ | --------- | ------------------------------- |
+| `primitives-temporal.bench.ts` | Angle     | 构造/归一化/算术                |
+|                                | Duration  | 构造与换算/算术                 |
+|                                | Tolerance | almostEqual/对象构造            |
+|                                | Instant   | fromUTC 构造/JD 转换/多时间尺度 |
+
+### 天象与历法
+
+| 文件                        | 基准项       | 说明                    |
+| --------------------------- | ------------ | ----------------------- |
+| `calendar-chinese.bench.ts` | 年度节气求解 | `solarTermsOfYear`      |
+|                             | 年度朔望扫描 | 年内所有朔时刻扫描      |
+|                             | 年度农历月表 | `lunarMonthTableOfYear` |
 
 ## 约定
 
