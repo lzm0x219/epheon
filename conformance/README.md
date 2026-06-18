@@ -29,18 +29,26 @@ pnpm conformance
 当前 runner 基于 `vitest`，执行：
 
 - `conformance/calendar-chinese.test.ts`
+- `conformance/solar-terms.test.ts`
+- `conformance/lunar-phases.test.ts`
 
-当前只校验一条最小链路：
+当前校验三条链路：
 
-- `@epheon/calendar-chinese` 的公共 API
-- 对照 `standards/calendar-chinese/lunar.json`
+- 中国历法：`@epheon/calendar-chinese` ↔ `standards/calendar-chinese/lunar.json`
+- 二十四节气：`@epheon/phenomena` ↔ `standards/solar/terms.json`
+- 朔望：`@epheon/phenomena` ↔ `standards/lunar/phases.json`
 
 ## 当前规则
 
-当前中国历法 conformance 使用离散结果的精确相等校验，不使用数值 tolerance：
+中国历法 conformance 使用离散结果的精确相等校验：
 
 - 农历月表：精确比较 `year`、`month`、`isLeapMonth`
 - 农历日期：精确比较 `year`、`month`、`day`、`isLeapMonth`
+
+天象 conformance 使用数值 tolerance：
+
+- 太阳节气：±15 分钟（VSOP87 低阶模型 vs JPL Horizons）
+- 朔望：±6 小时（6 小时步进扫描算法的最大理论误差）
 
 > 完整的 fixture 数据来源、领域分类与 tolerance 约定参见 [`standards/README.md`](../standards/README.md#数据来源)。
 
