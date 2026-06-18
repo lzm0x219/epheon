@@ -8,7 +8,7 @@
 | ----- | ------ | -------------------------------- | -------------------------------------------------------- |
 | S5-T1 | 已完成 | 维护跨阶段标准样例目录           | `standards/`                                             |
 | S5-T2 | 已完成 | 为中国历法补 fixture             | `standards/calendar-chinese/` 或等价目录                 |
-| S5-T3 | 待开始 | 建立可运行的 conformance 入口    | `conformance/`                                           |
+| S5-T3 | 已完成 | 建立可运行的 conformance 入口    | `conformance/`                                           |
 | S5-T4 | 待开始 | 建立最小 benchmark 入口          | `benchmarks/`                                            |
 | S5-T5 | 进行中 | 明确数据来源、误差与更新规则文档 | `standards/README.md`、后续 conformance / benchmark 文档 |
 
@@ -66,7 +66,7 @@
 
 ## S5-T3：建立可运行的 conformance 入口
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -76,10 +76,23 @@
 
 - S5-T2
 
+当前产出：
+
+- `conformance/calendar-chinese.test.ts`
+- `conformance/vitest.config.ts`
+- `conformance/README.md`
+- 根 `package.json` 中的 `pnpm conformance` 入口
+
 完成条件：
 
 - 至少存在一条可以独立执行的跨实现或跨数据核对链路。
 - 误差容忍度和数据来源在入口文档中明确。
+
+当前结果：
+
+- 提供 `pnpm conformance`，可独立执行中国历法 fixture 核对。
+- 当前入口对照 `standards/calendar-chinese/lunar.json` 校验农历月表与农历日期结果。
+- 入口文档已明确当前使用精确相等校验，以及样例 `basis` 为数据来源说明。
 
 ## S5-T4：建立最小 benchmark 入口
 

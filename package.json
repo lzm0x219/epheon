@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "pnpm moon run :build",
+    "conformance": "vitest run --config conformance/vitest.config.ts",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint",
