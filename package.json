@@ -9,6 +9,7 @@
     "format:check": "oxfmt --check .",
     "lint": "oxlint",
     "test": "vitest",
+    "test:analytics": "vitest --reporter=junit --outputFile=test-report.junit.xml",
     "coverage": "vitest run --coverage",
     "typecheck": "tsgo --noEmit"
   },

@@ -1,0 +1,36 @@
+coverage:
+  status:
+    project:
+      calendar-chinese:
+        paths:
+          - packages/calendar-chinese/
+      dataset-delta-t:
+        paths:
+          - packages/dataset-delta-t/
+      dataset-delta:
+        paths:
+          - packages/dataset-delta/
+      dataset-leap-seconds:
+        paths:
+          - packages/dataset-leap-seconds/
+      ephemerides:
+        paths:
+          - packages/ephemerides/
+      ephemerides-elp2000:
+        paths:
+          - packages/ephemerides-elp2000/
+      ephemerides-vsop87:
+        paths:
+          - packages/ephemerides-vsop87/
+      phenomena:
+        paths:
+          - packages/phenomena/
+      primitives:
+        paths:
+          - packages/primitives/
+      reference:
+        paths:
+          - packages/reference/
+      temporal:
+        paths:
+          - packages/temporal/
