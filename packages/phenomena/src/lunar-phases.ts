@@ -2,6 +2,12 @@ import { Angle } from "@epheon/primitives";
 import { Body, ReferenceFrame } from "@epheon/reference";
 import { Instant } from "@epheon/temporal";
 import type { PhenomenaContext } from "./solar-terms";
+import {
+  createInstantFromUtcMilliseconds,
+  isBracket,
+  normalizeSignedDegrees,
+  toUtcMilliseconds
+} from "./internal/helpers";
 
 const SEARCH_STEP_MILLISECONDS = 6 * 60 * 60 * 1000;
 const ROOT_TOLERANCE_MILLISECONDS = 1000;
@@ -188,10 +194,6 @@ function targetLongitudeDifferenceDegreesOf(kind: LunarPhaseKind): number {
   return kind === LunarPhaseKind.FullMoon ? 180 : 0;
 }
 
-function isBracket(left: number, right: number): boolean {
-  return left === 0 || right === 0 || (left < 0 && right > 0) || (left > 0 && right < 0);
-}
-
 /**
  * 验证收敛后的日月黄经差是否接近目标值，过滤因跨 ±180° 边界产生的误判。
  *
@@ -216,39 +218,4 @@ function isPhaseNearTarget(
   const rawDifference = normalizeSignedDegrees(moonLon - sunLon - targetLongitudeDifferenceDegrees);
 
   return Math.abs(rawDifference) < 10;
-}
-
-function createInstantFromUtcMilliseconds(
-  milliseconds: number,
-  context: PhenomenaContext
-): Instant {
-  return Instant.fromUTC(new Date(milliseconds).toISOString(), {
-    leapSeconds: context.leapSeconds,
-    deltaT: context.deltaT
-  });
-}
-
-function toUtcMilliseconds(instant: Instant): number {
-  const fields = instant.toUTCFields();
-  const wholeSeconds = Math.trunc(fields.second);
-  const fractionalMilliseconds = Math.round((fields.second - wholeSeconds) * 1000);
-
-  return (
-    Date.UTC(
-      fields.year,
-      fields.month - 1,
-      fields.day,
-      fields.hour,
-      fields.minute,
-      wholeSeconds,
-      fractionalMilliseconds
-    ) -
-    fields.offsetMinutes * 60_000
-  );
-}
-
-function normalizeSignedDegrees(degrees: number): number {
-  const normalized = (((degrees + 180) % 360) + 360) % 360;
-
-  return normalized - 180;
 }
