@@ -39,6 +39,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@4n6h4x0r/stem-branch": "^0.3.0",
     "@epheon/ephemerides": "workspace:*",
     "@epheon/primitives": "workspace:*",
     "@epheon/reference": "workspace:*",

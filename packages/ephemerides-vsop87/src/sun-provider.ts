@@ -1,3 +1,4 @@
+import { solarEclipticState } from "@4n6h4x0r/stem-branch";
 import {
   EphemerisError,
   Precision,
@@ -27,11 +28,11 @@ type SolarSolution = {
 };
 
 /**
- * 创建最小太阳 provider。
+ * 创建太阳 provider。
  *
  * 当前 provider 只支持 `Body.Sun`，并返回地心黄道坐标。
  *
- * @returns 遵循 `EphemerisProvider` 协议的最小太阳 provider。
+ * @returns 遵循 `EphemerisProvider` 协议的太阳 provider。
  */
 export function createVSOP87SunProvider(): EphemerisProvider {
   return {
@@ -94,7 +95,7 @@ export function solarEclipticPosition(
 }
 
 /**
- * 校验当前最小实现支持的 frame 与 precision。
+ * 校验当前实现支持的 frame 与 precision。
  *
  * @param options 调用方提供的星历要求。
  * @returns 已补齐默认值且确认受支持的 options。
@@ -135,73 +136,15 @@ function resolveJulianEphemerisDay(input: SolarPositionInput): JulianEphemerisDa
 }
 
 /**
- * 计算最小太阳模型。
+ * 计算太阳地心黄经与日地距离。
  *
- * 该模型输出地心黄经和日地距离，足够覆盖当前 bootstrap fixture。
+ * 复用 stem-branch 的 VSOP87D 解算（含 JPL DE441 拟合校正）：输入为 TT 时间尺度下的 JDE，
+ * 返回地心黄道经度（平春分点 / 视黄经）与日地距离。相对 JPL DE441，节气定时平均 1.05s、
+ * 最大 3.05s（209–2493 CE，1,008 个节气）。
  *
  * @param julianEphemerisDay TT 时间尺度下的 JDE。
  * @returns 当前时刻的太阳黄经与距离解。
  */
 function solveSolarPosition(julianEphemerisDay: number): SolarSolution {
-  const centuriesSinceJ2000 = (julianEphemerisDay - 2451545) / 36525;
-
-  const meanLongitudeDegrees = normalizeDegrees(
-    280.46646 +
-      36000.76983 * centuriesSinceJ2000 +
-      0.0003032 * centuriesSinceJ2000 * centuriesSinceJ2000
-  );
-  const meanAnomalyDegrees = normalizeDegrees(
-    357.52911 +
-      35999.05029 * centuriesSinceJ2000 -
-      0.0001537 * centuriesSinceJ2000 * centuriesSinceJ2000
-  );
-  const eccentricity =
-    0.016708634 -
-    0.000042037 * centuriesSinceJ2000 -
-    0.0000001267 * centuriesSinceJ2000 * centuriesSinceJ2000;
-  const meanAnomalyRadians = toRadians(meanAnomalyDegrees);
-  const equationOfCenterDegrees =
-    (1.914602 -
-      0.004817 * centuriesSinceJ2000 -
-      0.000014 * centuriesSinceJ2000 * centuriesSinceJ2000) *
-      Math.sin(meanAnomalyRadians) +
-    (0.019993 - 0.000101 * centuriesSinceJ2000) * Math.sin(2 * meanAnomalyRadians) +
-    0.000289 * Math.sin(3 * meanAnomalyRadians);
-  const trueLongitudeDegrees = normalizeDegrees(meanLongitudeDegrees + equationOfCenterDegrees);
-  const trueAnomalyDegrees = normalizeDegrees(meanAnomalyDegrees + equationOfCenterDegrees);
-  const omegaRadians = toRadians(125.04 - 1934.136 * centuriesSinceJ2000);
-
-  // ponytail: bootstrap with a low-order solar model; replace with full VSOP87 terms when
-  // multi-century accuracy or non-solar bodies become part of the public contract.
-  return {
-    trueLongitudeDegrees,
-    apparentLongitudeDegrees: normalizeDegrees(
-      trueLongitudeDegrees - 0.00569 - 0.00478 * Math.sin(omegaRadians)
-    ),
-    radiusAu:
-      (1.000001018 * (1 - eccentricity * eccentricity)) /
-      (1 + eccentricity * Math.cos(toRadians(trueAnomalyDegrees)))
-  };
-}
-
-/**
- * 归一化角度到 [0, 360)。
- *
- * @param degrees 任意度数。
- * @returns 归一化后的度数。
- */
-function normalizeDegrees(degrees: number): number {
-  const normalized = degrees % 360;
-
-  return normalized < 0 ? normalized + 360 : normalized;
-}
-
-/**
- * 将度数换算成弧度。
- *
- * @param degrees 度数值。
- * @returns 对应弧度值。
- */
-function toRadians(degrees: number): number {
-  return (degrees * Math.PI) / 180;
+  return solarEclipticState(julianEphemerisDay);
 }

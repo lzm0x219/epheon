@@ -196,6 +196,9 @@ importers:
 
   packages/ephemerides-vsop87:
     dependencies:
+      '@4n6h4x0r/stem-branch':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@epheon/ephemerides':
         specifier: workspace:*
         version: link:../ephemerides
@@ -292,6 +295,10 @@ importers:
         version: 6.0.3
 
 packages:
+
+  '@4n6h4x0r/stem-branch@0.3.0':
+    resolution: {integrity: sha512-7JXAGxPu/H+FItDFv1OxSOEqVjseftLMST1hzA+8pCfUDRuyO7R7Qtcyfdmh0PfzKYKEOgSpLWESiwKYMWgCHw==}
+    hasBin: true
 
   '@babel/generator@8.0.0':
     resolution: {integrity: sha512-NT9NrVwJsbSV6Y2FSstWa71EETOnzrjkL5/wX3D2mYHtKM+qvqB1DvR4D0Setb/gDBsHzRICifwEWMO8CnTF6g==}
@@ -1660,6 +1667,8 @@ packages:
     hasBin: true
 
 snapshots:
+
+  '@4n6h4x0r/stem-branch@0.3.0': {}
 
   '@babel/generator@8.0.0':
     dependencies:
