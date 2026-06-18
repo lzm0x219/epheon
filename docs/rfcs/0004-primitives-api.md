@@ -25,7 +25,7 @@ Epsilon comparison helpers
 
 ```txt
 Vector2
-Vector3
+Vector3         ← 已于 2026-06 提前实现并从公共入口导出，primitive README 已同步更新。
 Matrix3
 Matrix4
 Polynomial
