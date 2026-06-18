@@ -7,7 +7,7 @@
 | ID    | 状态   | 任务                                | 主要输出                                 |
 | ----- | ------ | ----------------------------------- | ---------------------------------------- |
 | S4-T1 | 已完成 | 实现农历月段构建与最小闰月判定切片  | `packages/calendar-chinese/src/index.ts` |
-| S4-T2 | 进行中 | 生成稳定的农历月表 API              | `packages/calendar-chinese/`             |
+| S4-T2 | 已完成 | 生成稳定的农历月表 API              | `packages/calendar-chinese/`             |
 | S4-T3 | 待开始 | 提供给定时刻查询农历日期的最小 API  | `packages/calendar-chinese/`             |
 | S4-T4 | 待开始 | 补月份编号、年界与日期映射规则      | `packages/calendar-chinese/`             |
 | S4-T5 | 待开始 | 增补干支能力                        | `packages/calendar-chinese/`             |
@@ -34,7 +34,7 @@
 
 ## S4-T2：生成稳定的农历月表 API
 
-状态：`进行中`
+状态：`已完成`
 
 目标：
 
@@ -46,6 +46,11 @@
 - S2-T4
 - S3-T3
 - S4-T1
+
+当前产出：
+
+- `packages/calendar-chinese/src/index.ts`
+- `packages/calendar-chinese/tests/lunar-months.test.ts`
 
 完成条件：
 

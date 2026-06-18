@@ -95,6 +95,9 @@ importers:
 
   packages/calendar-chinese:
     dependencies:
+      '@epheon/phenomena':
+        specifier: workspace:*
+        version: link:../phenomena
       '@epheon/temporal':
         specifier: workspace:*
         version: link:../temporal
