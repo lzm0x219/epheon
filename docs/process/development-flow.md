@@ -109,7 +109,9 @@ reviews
 
 当前主线集中在：
 
-1. `docs/tasks/0004-stage-4-chinese-calendar-tasks.md`
-2. `docs/tasks/0005-stage-5-verification-tasks.md`
+1. `docs/plans/0007-post-minimum-roadmap.md`
+2. `docs/tasks/0007-post-minimum-stabilization-tasks.md`
 
-也就是说，除非出现新的架构变化，日常开发优先更新 `docs/tasks/`，而不是频繁改 `docs/plans/`。
+也就是说，当前已经从“补最小链路”切换到“做稳定化收口”。
+
+除非出现新的架构变化，当前日常开发优先更新 `docs/tasks/0007-post-minimum-stabilization-tasks.md`，而不是回到旧阶段里零散追加任务。

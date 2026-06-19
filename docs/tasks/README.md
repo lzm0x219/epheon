@@ -17,6 +17,7 @@
 - [0004-stage-4-chinese-calendar-tasks.md](0004-stage-4-chinese-calendar-tasks.md)
 - [0005-stage-5-verification-tasks.md](0005-stage-5-verification-tasks.md)
 - [0006-stage-6-compatibility-and-tooling-tasks.md](0006-stage-6-compatibility-and-tooling-tasks.md)
+- [0007-post-minimum-stabilization-tasks.md](0007-post-minimum-stabilization-tasks.md)
 
 ## 当前总览
 
@@ -28,3 +29,4 @@
 | 第四阶段：中国历法     | `0004` | 已完成最小链路 |
 | 第五阶段：验证体系     | `0005` | 已完成最小链路 |
 | 第六阶段：兼容与工具   | `0006` | 暂缓           |
+| 后最小链路：稳定化     | `0007` | 进行中         |
