@@ -50,19 +50,19 @@ standards/
 
 ### 快速索引
 
-| 文件                               | 根结构                             | 说明                  |
-| ---------------------------------- | ---------------------------------- | --------------------- |
-| `primitives/angles.json`           | `conversions[]`、`normalization[]` | 角度单位转换与归一化  |
-| `primitives/durations.json`        | `conversions[]`                    | 时长单位转换          |
-| `primitives/vectors.json`          | `vectors[]`、`operations[]`        | 向量数值与运算结果    |
-| `reference/coordinates.json`       | `coordinates[]`                    | 球面坐标与笛卡尔转换  |
-| `reference/frames.json`            | `frames[]`                         | 预设参考系定义        |
-| `calendar-chinese/lunar.json`      | `monthTables[]`、`lunarDates[]`    | 农历月表与历日样例    |
-| `solar/longitudes.json`            | `solarLongitudes[]`                | 太阳视黄经参考样例    |
-| `solar/terms.json`                 | `solarTerms[]`                     | 二十四节气时刻样例    |
-| `temporal/julian-days.json`        | `utcInstants[]`                    | UTC 与 JD 映射        |
-| `temporal/time-scales.json`        | `timeScaleConversions[]`           | UTC 与各时间尺度转换  |
-| `temporal/utc-invalid-inputs.json` | `utcDateTimes[]`                   | 非法 UTC 输入与错误码 |
+| 文件                               | 根结构                                      | 说明                     |
+| ---------------------------------- | ------------------------------------------- | ------------------------ |
+| `primitives/angles.json`           | `conversions[]`、`normalization[]`          | 角度单位转换与归一化     |
+| `primitives/durations.json`        | `conversions[]`                             | 时长单位转换             |
+| `primitives/vectors.json`          | `vectors[]`、`operations[]`                 | 向量数值与运算结果       |
+| `reference/coordinates.json`       | `coordinates[]`                             | 球面坐标与笛卡尔转换     |
+| `reference/frames.json`            | `frames[]`                                  | 预设参考系定义           |
+| `calendar-chinese/lunar.json`      | `monthTables[]`、`lunarDates[]`、`ganzhi[]` | 农历月表、历日与干支样例 |
+| `solar/longitudes.json`            | `solarLongitudes[]`                         | 太阳视黄经参考样例       |
+| `solar/terms.json`                 | `solarTerms[]`                              | 二十四节气时刻样例       |
+| `temporal/julian-days.json`        | `utcInstants[]`                             | UTC 与 JD 映射           |
+| `temporal/time-scales.json`        | `timeScaleConversions[]`                    | UTC 与各时间尺度转换     |
+| `temporal/utc-invalid-inputs.json` | `utcDateTimes[]`                            | 非法 UTC 输入与错误码    |
 
 ### `primitives/angles.json`
 
@@ -167,7 +167,7 @@ standards/
 
 ### `calendar-chinese/lunar.json`
 
-根结构：`{ monthTables: LunarMonthTableSample[]; lunarDates: LunarDateSample[] }`
+根结构：`{ monthTables: LunarMonthTableSample[]; lunarDates: LunarDateSample[]; ganzhi: GanzhiSample[] }`
 
 `monthTables[]`
 
@@ -197,6 +197,25 @@ standards/
 | `day`         | number  | 预期农历日编号                 |
 | `isLeapMonth` | boolean | 预期当前月份是否闰月           |
 | `basis`       | string  | 样例来源、规则集或边界场景说明 |
+
+`ganzhi[]`
+
+| 字段    | 类型   | 说明                           |
+| ------- | ------ | ------------------------------ |
+| `input` | string | 查询时刻，带显式时区偏移       |
+| `year`  | object | 预期纪年结果                   |
+| `month` | object | 预期纪月结果                   |
+| `day`   | object | 预期纪日结果                   |
+| `hour`  | object | 预期纪时结果                   |
+| `basis` | string | 样例来源、规则集或边界场景说明 |
+
+`ganzhi[].year`、`ganzhi[].month`、`ganzhi[].day`、`ganzhi[].hour`
+
+| 字段     | 类型   | 说明       |
+| -------- | ------ | ---------- |
+| `stem`   | string | 天干       |
+| `branch` | string | 地支       |
+| `name`   | string | 干支组合名 |
 
 ### `temporal/julian-days.json`
 

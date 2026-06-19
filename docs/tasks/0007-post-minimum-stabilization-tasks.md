@@ -7,7 +7,7 @@
 | ID    | 状态   | 任务                             | 主要输出                                                    |
 | ----- | ------ | -------------------------------- | ----------------------------------------------------------- |
 | R7-T1 | 已完成 | 补包级 README 缺口与过时描述     | `packages/*/README.md`                                      |
-| R7-T2 | 待开始 | 扩充天象与中国历法 fixture 覆盖  | `standards/`、对应 tests / conformance                      |
+| R7-T2 | 已完成 | 扩充天象与中国历法 fixture 覆盖  | `standards/`、对应 tests / conformance                      |
 | R7-T3 | 待开始 | 收口精度、误差来源与适用边界文档 | `standards/README.md`、相关 package README、必要时补 review |
 | R7-T4 | 待开始 | 复核并收口中国历法公共 API 承诺  | `packages/calendar-chinese/`、相关 docs                     |
 | R7-T5 | 待开始 | 形成稳定化收口审查结论           | `docs/reviews/`                                             |
@@ -52,7 +52,7 @@
 
 ## R7-T2：扩充天象与中国历法 fixture 覆盖
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -70,11 +70,28 @@
 - 中国历法样例目前只覆盖少量闰月年、年界与月界。
 - 样例扩充后需要同步补测试与 conformance。
 
+当前产出：
+
+- `standards/lunar/phases.json`
+- `standards/calendar-chinese/lunar.json`
+- `packages/phenomena/tests/lunar-phases.test.ts`
+- `packages/calendar-chinese/tests/lunar-months.test.ts`
+- `conformance/lunar-phases.test.ts`
+- `conformance/calendar-chinese.test.ts`
+- `standards/README.md`
+- `conformance/README.md`
+
 完成条件：
 
 - 节气、朔望、中国历法都比当前有更广的代表性样例覆盖。
 - 至少覆盖更多年份、更多边界，而不只是单点证明。
 - 对应 tests / conformance 继续保持可运行。
+
+当前结果：
+
+- `standards/lunar/phases.json` 当前覆盖 2020-2025 的朔望样例，测试与 conformance 同步使用 `expectedElongationDegrees`。
+- `standards/calendar-chinese/lunar.json` 补到了更多闰月年、年界、月界样例，并新增干支样例。
+- 中国历法 conformance 现在同时校验农历月表、农历日期和干支结果。
 
 ## R7-T3：收口精度、误差来源与适用边界文档
 

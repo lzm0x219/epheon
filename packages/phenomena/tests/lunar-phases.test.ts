@@ -9,9 +9,10 @@ import { Duration } from "../../primitives/src";
 import { Body, type Position } from "../../reference/src";
 import { Instant } from "../../temporal/src";
 import { findLunarPhaseBetween, LunarPhaseKind } from "../src";
-import { expectInstantClose } from "./helpers";
+import { expectInstantClose, expectNumberClose } from "./helpers";
 
 const PHASE_TIME_TOLERANCE = Duration.fromSeconds(6 * 60 * 60);
+const ELONGATION_TOLERANCE = 1e-9;
 const sunProvider = createVSOP87SunProvider();
 const moonProvider = createELP2000MoonProvider();
 const context = {
@@ -39,6 +40,11 @@ describe("@epheon/phenomena lunar phases", () => {
 
       expect(actual.kind).toBe(
         sample.type === "newMoon" ? LunarPhaseKind.NewMoon : LunarPhaseKind.FullMoon
+      );
+      expectNumberClose(
+        actual.targetLongitudeDifference.normalizeDegrees().toDegrees(),
+        sample.expectedElongationDegrees,
+        ELONGATION_TOLERANCE
       );
       expectInstantClose(toUtcMilliseconds(actual.instant), expected, PHASE_TIME_TOLERANCE);
     }

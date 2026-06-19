@@ -132,24 +132,15 @@ describe("@epheon/calendar-chinese", () => {
     }
   });
 
-  it("returns the four pillars for the 2024 spring festival sample", () => {
-    expect(ganzhiOf(createInstant("2024-02-10T12:00:00+08:00"), context)).toEqual({
-      year: { stem: "甲", branch: "辰", name: "甲辰" },
-      month: { stem: "丙", branch: "寅", name: "丙寅" },
-      day: { stem: "甲", branch: "辰", name: "甲辰" },
-      hour: { stem: "庚", branch: "午", name: "庚午" }
-    });
-  });
-
-  it("switches ganzhi year and month at the 2024 lichun boundary", () => {
-    expect(ganzhiOf(createInstant("2024-02-04T12:00:00+08:00"), context)).toMatchObject({
-      year: { name: "癸卯" },
-      month: { name: "乙丑" }
-    });
-    expect(ganzhiOf(createInstant("2024-02-04T18:00:00+08:00"), context)).toMatchObject({
-      year: { name: "甲辰" },
-      month: { name: "丙寅" }
-    });
+  it("matches bootstrap ganzhi standards for spring-festival and lichun boundaries", () => {
+    for (const sample of calendarChineseStandards.ganzhi) {
+      expect(ganzhiOf(createInstant(sample.input), context)).toEqual({
+        year: sample.year,
+        month: sample.month,
+        day: sample.day,
+        hour: sample.hour
+      });
+    }
   });
 });
 

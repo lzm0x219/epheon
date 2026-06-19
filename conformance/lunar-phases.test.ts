@@ -44,6 +44,9 @@ describe("conformance: lunar-phases", () => {
       const phase = findLunarPhaseBetween(kind, start, end, context);
 
       expect(phase.kind).toBe(kind);
+      expect(phase.targetLongitudeDifference.normalizeDegrees().toDegrees()).toBe(
+        sample.expectedElongationDegrees
+      );
 
       const actualMs = toUtcMilliseconds(phase.instant);
       const diffMs = Math.abs(actualMs - expectedMs);

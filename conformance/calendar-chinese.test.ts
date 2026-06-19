@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { lunarDateOf, lunarMonthTableBetween } from "../packages/calendar-chinese/src";
+import { ganzhiOf, lunarDateOf, lunarMonthTableBetween } from "../packages/calendar-chinese/src";
 import { createDeltaTProvider } from "../packages/dataset-delta-t/src";
 import { createLeapSecondProvider } from "../packages/dataset-leap-seconds/src";
 import { createELP2000MoonProvider } from "../packages/ephemerides-elp2000/src";
@@ -47,6 +47,17 @@ describe("conformance: calendar-chinese", () => {
         month: sample.month,
         day: sample.day,
         isLeapMonth: sample.isLeapMonth
+      });
+    }
+  });
+
+  it("matches the bootstrap ganzhi standards", () => {
+    for (const sample of calendarChineseStandards.ganzhi) {
+      expect(ganzhiOf(createInstant(sample.input), context)).toEqual({
+        year: sample.year,
+        month: sample.month,
+        day: sample.day,
+        hour: sample.hour
       });
     }
   });

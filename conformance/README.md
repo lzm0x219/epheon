@@ -44,6 +44,7 @@ pnpm conformance
 
 - 农历月表：精确比较 `year`、`month`、`isLeapMonth`
 - 农历日期：精确比较 `year`、`month`、`day`、`isLeapMonth`
+- 干支结果：精确比较 `year`、`month`、`day`、`hour` 四柱
 
 天象 conformance 使用数值 tolerance：
 
