@@ -6,7 +6,7 @@
 
 | ID    | 状态   | 任务                             | 主要输出                                                    |
 | ----- | ------ | -------------------------------- | ----------------------------------------------------------- |
-| R7-T1 | 待开始 | 补包级 README 缺口与过时描述     | `packages/*/README.md`                                      |
+| R7-T1 | 已完成 | 补包级 README 缺口与过时描述     | `packages/*/README.md`                                      |
 | R7-T2 | 待开始 | 扩充天象与中国历法 fixture 覆盖  | `standards/`、对应 tests / conformance                      |
 | R7-T3 | 待开始 | 收口精度、误差来源与适用边界文档 | `standards/README.md`、相关 package README、必要时补 review |
 | R7-T4 | 待开始 | 复核并收口中国历法公共 API 承诺  | `packages/calendar-chinese/`、相关 docs                     |
@@ -14,7 +14,7 @@
 
 ## R7-T1：补包级 README 缺口与过时描述
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -31,11 +31,24 @@
 - `packages/phenomena/README.md` 仍停留在“只含节气求解”的旧描述。
 - 其他 package README 需要复核是否和当前公共导出一致。
 
+当前产出：
+
+- `packages/reference/README.md`
+- `packages/phenomena/README.md`
+- `packages/ephemerides-elp2000/README.md`
+- `packages/calendar-chinese/README.md`
+
 完成条件：
 
 - 至少补齐审计中点名的 README 缺口。
 - README 中的能力说明与当前公共 API 对齐。
 - 不在 README 里提前承诺尚未稳定的历史规则或未来 package。
+
+当前结果：
+
+- `reference` 与 `phenomena` README 已与当前公共能力对齐。
+- 补齐了 `ephemerides-elp2000` 的导出、用法和能力边界说明。
+- 补齐了 `calendar-chinese` 的导出、上下文用法和当前承诺范围说明。
 
 ## R7-T2：扩充天象与中国历法 fixture 覆盖
 
