@@ -9,7 +9,7 @@
 | R7-T1 | 已完成 | 补包级 README 缺口与过时描述     | `packages/*/README.md`                                      |
 | R7-T2 | 已完成 | 扩充天象与中国历法 fixture 覆盖  | `standards/`、对应 tests / conformance                      |
 | R7-T3 | 已完成 | 收口精度、误差来源与适用边界文档 | `standards/README.md`、相关 package README、必要时补 review |
-| R7-T4 | 待开始 | 复核并收口中国历法公共 API 承诺  | `packages/calendar-chinese/`、相关 docs                     |
+| R7-T4 | 已完成 | 复核并收口中国历法公共 API 承诺  | `packages/calendar-chinese/`、相关 docs                     |
 | R7-T5 | 待开始 | 形成稳定化收口审查结论           | `docs/reviews/`                                             |
 
 ## R7-T1：补包级 README 缺口与过时描述
@@ -133,7 +133,7 @@
 
 ## R7-T4：复核并收口中国历法公共 API 承诺
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -154,6 +154,12 @@
 - README、公共导出、测试口径互相一致。
 - 明确哪些能力已稳定，哪些仍未进入承诺范围。
 - 不提前启动 `@epheon/calendars` 抽象。
+
+当前结果：
+
+- 复核了 `packages/calendar-chinese/src/index.ts`、包 README 与现有测试口径，确认当前稳定承诺收口为 `modern` 规则集下的农历月表、农历日期与干支查询。
+- 根 `README.md` 的 package 说明与主线描述已同步更新，不再把当前能力写成过窄的“月序与闰月切片”，也不再模糊表述为未限定范围的“农历查询 API”。
+- 当前未把历史规则、农历日期到 `Instant` 的反向换算、`@epheon/calendars` 统一抽象纳入公共承诺范围。
 
 ## R7-T5：形成稳定化收口审查结论
 
