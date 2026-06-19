@@ -46,6 +46,12 @@ const apparentLongitude = solarEclipticLongitude(instant, {
 - 默认返回 `MeanOfDateEcliptic`；显式请求 `TrueOfDateEcliptic` 时会加入视黄经修正。
 - 暂不支持月亮、行星、ICRS、`Precision.FastLow` 或 `Precision.High`。
 
+## 当前验证口径
+
+- 当前可对外说明的口径不是“完整 VSOP87 精度”，而是“当前节气链路在 fixture 覆盖年份内对照 JPL Horizons，conformance 容忍度为 ±15 分钟”。
+- 这个口径来自 `@epheon/phenomena` 对节气事件的校验，不等于对任意时刻太阳位置都给出同等级别保证。
+- 更完整的来源、年份覆盖和不能宣称的范围，统一参见 `standards/README.md#当前可对外说明的精度口径`。
+
 ## 许可
 
 MIT

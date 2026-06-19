@@ -50,6 +50,13 @@ const apparentLongitude = lunarEclipticLongitude(instant, {
 - 默认返回 `MeanOfDateEcliptic`；显式请求 `TrueOfDateEcliptic` 时会加入当前实现支持的真黄经修正。
 - 公开 helper `lunarEclipticLongitude(...)` 和 `lunarEclipticPosition(...)` 可直接用于只读计算，不必先包一层 provider。
 
+## 当前验证口径
+
+- 当前可对外说明的口径不是“完整 ELP2000 精度”，而是“当前月亮位置实现足以稳定支撑朔望与中国历法主链路”。
+- 现有 conformance 口径落在事件层：朔望样例覆盖 2020-2025，事件时刻容忍度为 ±6 小时。
+- 这个口径来自朔望与中国历法链路的回归验证，不等于对任意时刻月亮位置给出独立外部校准精度保证。
+- 更完整的来源、年份覆盖和不能宣称的范围，统一参见 `standards/README.md#当前可对外说明的精度口径`。
+
 ## 当前范围
 
 ```txt

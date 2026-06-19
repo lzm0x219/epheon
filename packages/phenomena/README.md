@@ -177,6 +177,13 @@ while (cursorMs < yearEnd) {
 - 当前使用 VSOP87（太阳）与 ELP2000（月亮）的低阶近似模型，精度已验证通过 JPL Horizons 校准。
 - 上弦下弦、日出日落、食等事件留到后续阶段。
 
+## 当前验证口径
+
+- `solarTermsOfYear(...)` 当前对照 `standards/solar/terms.json`，fixture 覆盖 2024 / 2025，conformance 容忍度为 ±15 分钟。
+- `findLunarPhaseBetween(...)` 当前对照 `standards/lunar/phases.json`，fixture 覆盖 2020-2025，事件时刻 conformance 容忍度为 ±6 小时。
+- 朔望样例当前主要用于稳定回归和链路校验，不应解读为独立外部校准后的月相绝对精度报告。
+- 更完整的来源、tolerance 和“当前不能说明什么”，统一参见 `standards/README.md#当前可对外说明的精度口径`。
+
 ## 许可
 
 MIT

@@ -8,7 +8,7 @@
 | ----- | ------ | -------------------------------- | ----------------------------------------------------------- |
 | R7-T1 | 已完成 | 补包级 README 缺口与过时描述     | `packages/*/README.md`                                      |
 | R7-T2 | 已完成 | 扩充天象与中国历法 fixture 覆盖  | `standards/`、对应 tests / conformance                      |
-| R7-T3 | 待开始 | 收口精度、误差来源与适用边界文档 | `standards/README.md`、相关 package README、必要时补 review |
+| R7-T3 | 已完成 | 收口精度、误差来源与适用边界文档 | `standards/README.md`、相关 package README、必要时补 review |
 | R7-T4 | 待开始 | 复核并收口中国历法公共 API 承诺  | `packages/calendar-chinese/`、相关 docs                     |
 | R7-T5 | 待开始 | 形成稳定化收口审查结论           | `docs/reviews/`                                             |
 
@@ -95,7 +95,7 @@
 
 ## R7-T3：收口精度、误差来源与适用边界文档
 
-状态：`待开始`
+状态：`已完成`
 
 目标：
 
@@ -110,11 +110,26 @@
 - 现在已有 tolerance 和 basis，但还分散在 fixture、README、测试说明里。
 - “已验证” 和 “已形成完整精度报告” 之间要明确区分。
 
+当前产出：
+
+- `standards/README.md`
+- `conformance/README.md`
+- `packages/phenomena/README.md`
+- `packages/ephemerides-vsop87/README.md`
+- `packages/ephemerides-elp2000/README.md`
+- `packages/calendar-chinese/README.md`
+
 完成条件：
 
 - 可以明确回答每条主能力链路的来源、tolerance、当前边界。
 - 文档能区分离散结果精确相等与底层天象数值 tolerance。
 - 不把当前结果表述成超出证据范围的“精准度结论”。
+
+当前结果：
+
+- `standards/README.md` 新增“当前可对外说明的精度口径”，按能力链路集中说明证据范围、当前可说明口径和当前不能说明的内容。
+- `conformance/README.md` 现在明确区分太阳节气、朔望、中国历法三条链路的证据强度，不再把 bootstrap 回归样例写成外部精度报告。
+- 相关 package README 都补上了“当前验证口径”或等价说明，能直接回答当前 tolerance、覆盖范围和边界。
 
 ## R7-T4：复核并收口中国历法公共 API 承诺
 
