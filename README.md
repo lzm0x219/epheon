@@ -13,6 +13,9 @@
 </p>
 
 <p align="center">
+  <a href="https://codecov.io/gh/lzm0x219/epheon" >
+ <img src="https://codecov.io/gh/lzm0x219/epheon/graph/badge.svg?token=P82MvW5aX2"/>
+ </a>
   <a href="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lzm0x219/epheon/actions/workflows/ci.yml/badge.svg" /></a>
   <img alt="Node.js 24.16+" src="https://badges.ws/badge/Node.js-24.16%2B-339933?logo=nodedotjs&amp;logoColor=white" />
   <img alt="pnpm 11.7.0" src="https://badges.ws/badge/pnpm-11.7.0-F69220?logo=pnpm&amp;logoColor=white" />
