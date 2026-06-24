@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@changesets/cli':
-      specifier: 3.0.0-next.5
-      version: 3.0.0-next.5
+      specifier: 3.0.0-next.6
+      version: 3.0.0-next.6
     '@changesets/types':
       specifier: 6.1.0
       version: 6.1.0
@@ -55,7 +55,7 @@ importers:
     devDependencies:
       '@changesets/cli':
         specifier: 'catalog:'
-        version: 3.0.0-next.5
+        version: 3.0.0-next.6
       '@changesets/types':
         specifier: 'catalog:'
         version: 6.1.0
@@ -335,21 +335,21 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@changesets/apply-release-plan@8.0.0-next.5':
-    resolution: {integrity: sha512-srtEKIe1xPiVND0J1SIKjO+wsfOZObPVHOLspQuIUDQhaiq7RoF+O8ygdfSJ5hNu78pyE2urtQV6b8fSxTjuKg==}
+  '@changesets/apply-release-plan@8.0.0-next.6':
+    resolution: {integrity: sha512-Tnt9/AbEU4/uLkBzjF7KGjaB6MyzADG/+iMxq5khFEGM0s12Fp9plglMzajWX97/qgrcCVstFcVWpFTEGiNVxA==}
     engines: {node: ^22.11 || ^24 || >=26}
 
-  '@changesets/assemble-release-plan@7.0.0-next.5':
-    resolution: {integrity: sha512-IrDlC3spxd5Bb5VT4utRbmFhWzgUn6xUQ2029cLvVHHwkVxIBPKL77G8tLD8bKBiIaRv5gl6cWcv+uMX7iLyGQ==}
+  '@changesets/assemble-release-plan@7.0.0-next.6':
+    resolution: {integrity: sha512-0AqIQriI20QgtJQr7HumJ7FiaUsqA/VQMUWF29r6jnEOpmR4c8O/kMA8kFJOp7a1mlUNJqVbcz4RNCWlEDYC9A==}
     engines: {node: ^22.11 || ^24 || >=26}
 
   '@changesets/changelog-git@1.0.0-next.5':
     resolution: {integrity: sha512-lGyIWNGkPnY6yiwbFeWtf9yzjoMl0jmzwIGH24cAV9ZzKl0lLvjjlYTbcfZymqVcPqBSQEr2UQNg0ED4h7xlnQ==}
     engines: {node: ^22.11 || ^24 || >=26}
 
-  '@changesets/cli@3.0.0-next.5':
-    resolution: {integrity: sha512-jminqSK3VQj9kSolTfcAE6M54C8M0MFs5f25BxbVfY6+oqPMlMevTFrHXa1XfcUkYEgy7dUCHEo21A8k1nLFmQ==}
-    engines: {node: ^22.11 || ^24 || >=26}
+  '@changesets/cli@3.0.0-next.6':
+    resolution: {integrity: sha512-NPO8zyQc2icfJJTVqSMtRTIz3RyhIffgaj71T9BN7vBbVPWoeW+Niq+kxKTtvQw+EOkuaXv/AOEF8agkM4pq6A==}
+    engines: {node: ^22.11 || ^24 || >=26, npm: '>=10.9.0', pnpm: '>=10.0.0', yarn: '>=4.5.2'}
     hasBin: true
 
   '@changesets/config@4.0.0-next.5':
@@ -372,16 +372,16 @@ packages:
     resolution: {integrity: sha512-dhQ5qxmxVy8vQD6TBjNuVB3cv3MoyKogFIX+LFXi4hWceXeysOKuVytpAX84ywQw401uHuYlObZSU6qyj/hzzw==}
     engines: {node: ^22.11 || ^24 || >=26}
 
-  '@changesets/parse@1.0.0-next.5':
-    resolution: {integrity: sha512-SbIeZdWHhCVmt3EAx++1eqWnTMDlUYsk32kxNqhW5rS1r9NwLF1NY38Uqh2rLszE1OgJtjSJqRb6Z5PaPw4mxQ==}
+  '@changesets/parse@1.0.0-next.6':
+    resolution: {integrity: sha512-9eR8KHNC7foNCCwuDvzC5NAoNJ8m6UvcYPl+xwuWLbuM44ILMC3N7Fc0gjNZoUvFbSPc/HeCN63kX3HiPqLZMw==}
     engines: {node: ^22.11 || ^24 || >=26}
 
   '@changesets/pre@3.0.0-next.5':
     resolution: {integrity: sha512-vxcIPxRGrPaDZpNCJMahl1/xZa+bD9bhxEbJAde/lyvzPqA4lS7ugdtDNuobeRlothw8SGGjBSS8c+VouPDD5w==}
     engines: {node: ^22.11 || ^24 || >=26}
 
-  '@changesets/read@1.0.0-next.5':
-    resolution: {integrity: sha512-glsdwJHcXEdlmaJTV7WN2pQScESHSGp3aGiR6d0mDpI6eIsS0gVXP0PPK5Aw3zgQljrsS+ylXU//MFCr+ypuLA==}
+  '@changesets/read@1.0.0-next.6':
+    resolution: {integrity: sha512-WCCU0z2jy+uyo5ivI3vec8Ys+o5Nk0OwS6qUhm7kzQ6dRRIX85uZaVV+6TlnKRXcKzWEDrIt3ifj0Ul+v/sqvA==}
     engines: {node: ^22.11 || ^24 || >=26}
 
   '@changesets/should-skip-package@1.0.0-next.5':
@@ -779,6 +779,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@pnpm/deps.graph-sequencer@1100.0.0':
+    resolution: {integrity: sha512-IfhLdXMjNaAt2Z/r0hAqMvH4UN/Eb6LAbnSHqF9Ay1EhQId8rFX58yIWXLUit6VjJTJAptnSPtO8nSu2/ggQsg==}
+    engines: {node: '>=22.13'}
+
   '@publint/pack@0.1.4':
     resolution: {integrity: sha512-HDVTWq3H0uTXiU0eeSQntcVUTPP3GamzeXI41+x7uU9J65JgWQh3qWZHblR1i0npXfFtF+mxBiU2nJH8znxWnQ==}
     engines: {node: '>=18'}
@@ -1086,9 +1090,6 @@ packages:
     resolution: {integrity: sha512-BJ8/l4R5LRE7hW9WdSuGYrLSHi2ynxeFpDFbH0K/CgNeY/tyhk+vO6TYxXC5r5CpUhNVX310xzPsN/H9lCdfOA==}
     engines: {node: '>=14'}
 
-  argparse@2.0.1:
-    resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
@@ -1116,10 +1117,6 @@ packages:
 
   defu@6.1.7:
     resolution: {integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ==}
-
-  detect-indent@7.0.2:
-    resolution: {integrity: sha512-y+8xyqdGLL+6sh0tVeHcfP/QDd8gUgbasolJJpY7NgeQGSZ739bDtSiaiDgtoicy+mtYB81dKLxO9xRhCyIB3A==}
-    engines: {node: '>=12.20'}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -1214,14 +1211,13 @@ packages:
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
-  js-yaml@4.2.0:
-    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
-    hasBin: true
-
   jsesc@3.1.0:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
     hasBin: true
+
+  jsonc-parser@3.3.1:
+    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
   launch-editor@2.14.1:
     resolution: {integrity: sha512-QWBrQsMpH7gPr965dsKD/3cKWiNoTjpATQf++Xq63N6sKRGMwlVXz41O1IZTMfZQgBctD/K5Zt06+/I6pP6+HA==}
@@ -1698,18 +1694,18 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@changesets/apply-release-plan@8.0.0-next.5':
+  '@changesets/apply-release-plan@8.0.0-next.6':
     dependencies:
       '@changesets/config': 4.0.0-next.5
       '@changesets/format': 0.1.0
       '@changesets/git': 4.0.0-next.5
       '@changesets/should-skip-package': 1.0.0-next.5
       '@changesets/types': 7.0.0-next.5
-      detect-indent: 7.0.2
       import-meta-resolve: 4.2.0
+      jsonc-parser: 3.3.1
       semver: 7.8.4
 
-  '@changesets/assemble-release-plan@7.0.0-next.5':
+  '@changesets/assemble-release-plan@7.0.0-next.6':
     dependencies:
       '@changesets/errors': 1.0.0-next.3
       '@changesets/get-dependents-graph': 3.0.0-next.5
@@ -1721,22 +1717,23 @@ snapshots:
     dependencies:
       '@changesets/types': 7.0.0-next.5
 
-  '@changesets/cli@3.0.0-next.5':
+  '@changesets/cli@3.0.0-next.6':
     dependencies:
-      '@changesets/apply-release-plan': 8.0.0-next.5
-      '@changesets/assemble-release-plan': 7.0.0-next.5
+      '@changesets/apply-release-plan': 8.0.0-next.6
+      '@changesets/assemble-release-plan': 7.0.0-next.6
       '@changesets/changelog-git': 1.0.0-next.5
       '@changesets/config': 4.0.0-next.5
       '@changesets/errors': 1.0.0-next.3
       '@changesets/get-dependents-graph': 3.0.0-next.5
       '@changesets/git': 4.0.0-next.5
       '@changesets/pre': 3.0.0-next.5
-      '@changesets/read': 1.0.0-next.5
+      '@changesets/read': 1.0.0-next.6
       '@changesets/should-skip-package': 1.0.0-next.5
       '@changesets/types': 7.0.0-next.5
       '@changesets/write': 1.0.0-next.5
       '@clack/prompts': 1.5.1
       '@manypkg/get-packages': 3.1.0
+      '@pnpm/deps.graph-sequencer': 1100.0.0
       cac: 7.0.0
       import-meta-resolve: 4.2.0
       launch-editor: 2.14.1
@@ -1771,10 +1768,10 @@ snapshots:
       picomatch: 4.0.4
       tinyexec: 1.2.4
 
-  '@changesets/parse@1.0.0-next.5':
+  '@changesets/parse@1.0.0-next.6':
     dependencies:
       '@changesets/types': 7.0.0-next.5
-      js-yaml: 4.2.0
+      yaml: 2.9.0
 
   '@changesets/pre@3.0.0-next.5':
     dependencies:
@@ -1782,10 +1779,10 @@ snapshots:
       '@changesets/types': 7.0.0-next.5
       '@manypkg/get-packages': 3.1.0
 
-  '@changesets/read@1.0.0-next.5':
+  '@changesets/read@1.0.0-next.6':
     dependencies:
       '@changesets/git': 4.0.0-next.5
-      '@changesets/parse': 1.0.0-next.5
+      '@changesets/parse': 1.0.0-next.6
       '@changesets/types': 7.0.0-next.5
 
   '@changesets/should-skip-package@1.0.0-next.5':
@@ -2058,6 +2055,8 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.70.0':
     optional: true
 
+  '@pnpm/deps.graph-sequencer@1100.0.0': {}
+
   '@publint/pack@0.1.4': {}
 
   '@quansync/fs@1.0.0':
@@ -2270,8 +2269,6 @@ snapshots:
 
   ansis@4.3.1: {}
 
-  argparse@2.0.1: {}
-
   assertion-error@2.0.1: {}
 
   ast-kit@3.0.0:
@@ -2295,8 +2292,6 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   defu@6.1.7: {}
-
-  detect-indent@7.0.2: {}
 
   detect-libc@2.1.2: {}
 
@@ -2362,11 +2357,9 @@ snapshots:
 
   js-tokens@10.0.0: {}
 
-  js-yaml@4.2.0:
-    dependencies:
-      argparse: 2.0.1
-
   jsesc@3.1.0: {}
+
+  jsonc-parser@3.3.1: {}
 
   launch-editor@2.14.1:
     dependencies:
